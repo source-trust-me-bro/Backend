@@ -10,6 +10,7 @@ from app.api.deps import (
 from app.core.exceptions import NotFoundError
 from app.core.utils import require_object_id
 from app.repositories.articles import ArticleRepository
+from app.repositories.clicks import ClickRepository
 from app.repositories.library import Kind, LibraryRepository
 from app.schemas.article import ArticleSummary
 from app.schemas.base import Page
@@ -154,6 +155,7 @@ async def record_read(
 ) -> Response:
     object_id = await _require_article(article_id, article_repo)
     await library_repo.mark_read(profile["clerk_user_id"], object_id)
+    await ClickRepository(library_repo.database).record(profile["clerk_user_id"], object_id, "open")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 

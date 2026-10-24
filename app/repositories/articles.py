@@ -1,5 +1,6 @@
 import contextlib
 import re
+import time
 import weakref
 from datetime import UTC, datetime
 from typing import Any
@@ -37,6 +38,16 @@ LEGACY_COLLECTION = "articles"  # before the split into one collection per langu
 
 # Collections whose indexes this process has already ensured, per database object.
 _indexed: "weakref.WeakKeyDictionary[Any, set[str]]" = weakref.WeakKeyDictionary()
+# The language collections that exist, per database object: (listed at, names). Listing them is
+# a round trip and almost every read needs them, so the list is kept for a short while.
+_names: "weakref.WeakKeyDictionary[Any, tuple[float, list[str]]]" = weakref.WeakKeyDictionary()
+NAMES_TTL_SECONDS = 30
+
+
+def forget_collection_names(database: Any) -> None:
+    """Drop the cached list, so a collection created outside this repository shows up at once."""
+
+    _names.pop(database, None)
 
 
 def language_code(value: str | None) -> str:
@@ -84,8 +95,16 @@ class ArticleRepository(BaseRepository):
     # ------------------------------------------------------------ collections
 
     async def language_collection_names(self) -> list[str]:
-        names = await self.database.list_collection_names()
-        return sorted(n for n in names if n.startswith(ARTICLE_COLLECTION_PREFIX))
+        hit = _names.get(self.database)
+        if hit is not None and time.monotonic() - hit[0] < NAMES_TTL_SECONDS:
+            return hit[1]
+        names = sorted(
+            n
+            for n in await self.database.list_collection_names()
+            if n.startswith(ARTICLE_COLLECTION_PREFIX)
+        )
+        _names[self.database] = (time.monotonic(), names)
+        return names
 
     async def _writable(self, language: str | None):
         """The collection for a language, with its indexes ensured once per process."""
@@ -96,6 +115,7 @@ class ArticleRepository(BaseRepository):
         if name not in done:
             await ensure_article_indexes(collection)
             done.add(name)
+            forget_collection_names(self.database)  # a new language shows up at once
         return collection
 
     async def _targets(self, language: str | None) -> list[str]:
@@ -232,18 +252,6 @@ class ArticleRepository(BaseRepository):
             cursor = self.database[name].find({"_id": {"$in": ids}}, SUMMARY_PROJECTION)
             found.update({doc["_id"]: doc async for doc in cursor})
         return found
-
-    async def related(self, article: dict[str, Any], *, limit: int = 5) -> list[dict[str, Any]]:
-        filters: dict[str, Any] = {"_id": {"$ne": article["_id"]}}
-        topic_ids = article.get("topic_ids") or []
-        if topic_ids:
-            filters["topic_ids"] = {"$in": topic_ids}
-        # Related stories are in the same language, so this reads that one collection.
-        collection = self.database[collection_name_for(article.get("language"))]
-        cursor = (
-            collection.find(filters, SUMMARY_PROJECTION).sort(SORT_SPECS["newest"]).limit(limit)
-        )
-        return [doc async for doc in cursor]
 
     async def semantic_candidates(
         self, filters: dict[str, Any], *, limit: int

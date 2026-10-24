@@ -23,6 +23,7 @@ from app.services.clerk_service import fetch_clerk_user
 from app.services.embedding_service import EmbeddingService
 from app.services.extraction_service import ExtractionService
 from app.services.ingestion_service import IngestionService
+from app.services.related import RelatedService
 from app.services.rss_service import RSSService
 from app.services.search_service import SearchService
 
@@ -89,6 +90,12 @@ def get_search_service(
     settings: Settings = Depends(get_settings),
 ) -> SearchService:
     return SearchService(article_repo, embedding_service, settings)
+
+
+def get_related_service(
+    article_repo: ArticleRepository = Depends(get_article_repo),
+) -> RelatedService:
+    return RelatedService(article_repo)
 
 
 def get_ingestion_service(

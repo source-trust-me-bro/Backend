@@ -5,6 +5,7 @@ reference downstream. Reviewer names come from the authenticated account, never 
 request body, so every approval is traceable to a signed-in human.
 """
 
+import asyncio
 import logging
 from typing import Any, Literal
 
@@ -35,6 +36,24 @@ from app.services.newsroom_sync import NewsroomSync
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/newsroom", tags=["newsroom"])
+
+# Syncs started after a publish; kept referenced until they finish.
+_sync_tasks: set[asyncio.Task[None]] = set()
+
+
+def _sync_soon(sync: NewsroomSync) -> None:
+    """Copy published stories to the reader dashboard in the background, so a publish answers
+    at once. A failed copy must not undo the publish: the next sync picks it up."""
+
+    async def run() -> None:
+        try:
+            await sync.run()
+        except Exception:
+            logger.warning("Copying published stories to the dashboard failed", exc_info=True)
+
+    task = asyncio.create_task(run())
+    _sync_tasks.add(task)
+    task.add_done_callback(_sync_tasks.discard)
 
 
 def get_client(settings: Settings = Depends(get_settings)) -> NewsroomClient:
@@ -392,10 +411,7 @@ async def editor_post(
     body = payload.model_dump()
     body["editor"] = _display_name(profile)
     result = await client.request("POST", "/staff/posts", json=body)
-    try:
-        await sync.run()  # show it on the reader dashboard at once; the next sync retries
-    except Exception:
-        logger.warning("Copying published stories to the dashboard failed", exc_info=True)
+    _sync_soon(sync)
     return result
 
 
@@ -505,12 +521,7 @@ async def submit_review(
         decisions.append({**item.model_dump(), "reviewer": reviewer})
     result = await client.request("POST", f"/review/{pitch_id}", json={"decisions": decisions})
     if isinstance(result, dict) and result.get("status") == "published":
-        # Show it on the reader dashboard at once. A failed copy must not undo the publish:
-        # the next sync picks it up.
-        try:
-            await sync.run()
-        except Exception:
-            logger.warning("Copying published stories to the dashboard failed", exc_info=True)
+        _sync_soon(sync)
     return result
 
 

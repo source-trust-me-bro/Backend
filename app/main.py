@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.v1 import (
     articles,
+    clicks,
     communities,
     feedback,
     feeds,
@@ -105,6 +106,7 @@ def create_app() -> FastAPI:
     api_router.include_router(follows.router)
     api_router.include_router(feedback.router)
     api_router.include_router(newsroom.router)
+    api_router.include_router(clicks.router)
     application.include_router(api_router)
 
     @application.get("/", include_in_schema=False)

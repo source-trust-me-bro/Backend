@@ -17,6 +17,7 @@ from mongomock_motor import AsyncMongoMockClient
 from app.core.security import get_current_user
 from app.database import ensure_indexes, get_database
 from app.main import app as application
+from app.repositories.articles import forget_collection_names
 from app.schemas.user import ClerkPrincipal
 
 DEFAULT_SUB = "user_reader_1"
@@ -27,6 +28,7 @@ async def database() -> AsyncIterator[Any]:
     client = AsyncMongoMockClient()
     database = client["multilingual_news_test"]
     await ensure_indexes(database)
+    forget_collection_names(database)  # mock databases of earlier tests may compare equal
     yield database
     client.close()
 
@@ -84,6 +86,7 @@ def make_article(database: Any) -> Callable[..., Awaitable[dict[str, Any]]]:
         document = article_document(**overrides)
         result = await database[collection_name_for(document.get("language"))].insert_one(document)
         document["_id"] = result.inserted_id
+        forget_collection_names(database)  # written around the repository and its cache
         return document
 
     return _make

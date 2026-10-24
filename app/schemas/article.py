@@ -23,6 +23,15 @@ class ArticleSummary(MongoBaseModel):
     published_at: datetime | None = None
     topic_ids: ObjectIdList = Field(default_factory=list)
     created_at: datetime
+    # Hotlinked from the publisher, shown as "Photo: <source_name>"; never re-hosted.
+    image_url: str | None = None
+    # Newsroom stories split in two: "What happened" and "What it means for you".
+    basic_info: str | None = None
+    explanation: str | None = None
+    event_id: str | None = None
+    community_id: OptionalObjectIdStr = None  # the newsroom community the story was written for
+    reasons: list[str] = Field(default_factory=list)  # why a related or feed story is shown
+    clicks: dict[str, int] | None = None  # see ClickRepository.stats
 
 
 class ArticleDetail(ArticleSummary):

@@ -417,7 +417,8 @@ other users require the dedicated admin endpoint.
 ## API overview
 
 All routes are under `/api/v1`. Everything except the health routes requires a valid bearer
-token.
+token. Article lists, related stories, community feeds and the article page carry each story's
+click counts as `clicks`.
 
 | Method | Path | Access | Description |
 | --- | --- | --- | --- |
@@ -437,7 +438,7 @@ token.
 | GET | `/articles` | Reader | Filter, paginate, and keyword-search articles |
 | GET | `/articles/trending` | Reader | Most-read articles this week, padded with the newest (`limit`, `language`) |
 | GET | `/articles/{id}` | Reader | Article detail |
-| GET | `/articles/{id}/related` | Reader | Related articles by shared topics |
+| GET | `/articles/{id}/related` | Reader | Related stories from the news tree (same event, topic, branches, meaning, community), each with `reasons`; `community` (repeatable) favours the reader's newsroom communities |
 | GET | `/articles/{id}/translations` | Reader | Stored translations |
 | POST | `/articles/{id}/translations` | Editor | Create or update a translation |
 | GET | `/topics/tree` | Reader | Nested topic tree |
@@ -452,14 +453,18 @@ token.
 | GET | `/communities/{id}/feed` | Reader | Community-curated feed |
 | GET | `/feeds/personalized` | Reader | Personalized feed |
 | GET | `/feeds/following` | Reader | Newest articles from followed sources |
+| GET | `/feeds/community/{community_id}` | Reader | One newsroom community's stories, then the topics it reads (`language`, `limit`) |
 | GET | `/library/state` | Reader | Ids of saved and downloaded articles |
 | GET | `/library/saved`, `/library/downloaded`, `/library/history` | Reader | Paginated article lists |
 | PUT | `/library/{article_id}/saved` | Reader | Save or unsave (`{"value": bool}`) |
 | PUT | `/library/{article_id}/downloaded` | Reader | Mark or unmark as downloaded |
-| POST | `/library/{article_id}/read` | Reader | Record a read (history and trending) |
+| POST | `/library/{article_id}/read` | Reader | Record a read (history, trending, and an `open` click) |
 | DELETE | `/library/history`, `/library/downloaded` | Reader | Clear history or downloads |
 | GET | `/follows/sources` | Reader | Sources the caller follows |
 | PUT | `/follows/sources/{source_id}` | Reader | Follow or unfollow a source |
+| POST | `/clicks/{article_id}` | Reader | Count a click (`{"kind": "open"\|"outbound"\|"share", "community_id"}`), returns the totals |
+| GET | `/clicks/{article_id}` | Reader | `open_users`, `open_total`, `outbound_*`, `share_*`: unique readers and all clicks |
+| GET | `/clicks/top` | Reader | Most clicked stories (`kind`, `days`, `limit`, `language`) |
 | POST | `/feedback` | Reader | Send feedback to the team |
 | GET | `/feedback` | Editor | List feedback, newest first |
 

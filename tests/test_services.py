@@ -221,3 +221,52 @@ async def test_calls_to_the_newsroom_share_one_connection_pool(monkeypatch):
 
     assert len(created) == 2  # one pool for the four calls, one after it was closed
     await close_newsroom_clients()
+
+
+PHOTO_FEED_XML = """<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Photo feed</title>
+    <link>https://example.com</link>
+    <description>Example news</description>
+    <item>
+      <title>With enclosure</title>
+      <link>https://example.com/enclosure</link>
+      <enclosure url="https://example.com/photo.jpg" type="image/jpeg" length="1" />
+    </item>
+    <item>
+      <title>Image in the body</title>
+      <link>https://example.com/body</link>
+      <content:encoded><![CDATA[<img src="/logo.svg">
+        <img src="/uploads/bridge.jpg">]]></content:encoded>
+    </item>
+    <item>
+      <title>No photo</title>
+      <link>https://example.com/none</link>
+    </item>
+  </channel>
+</rss>
+"""
+
+
+async def test_rss_service_keeps_a_link_to_the_feed_photo():
+    async with httpx.AsyncClient(
+        transport=httpx.MockTransport(lambda request: httpx.Response(200, content=PHOTO_FEED_XML))
+    ) as client:
+        entries = await RSSService(client=client).fetch_entries("https://example.com/feed.xml")
+
+    assert [entry.image_url for entry in entries] == [
+        "https://example.com/photo.jpg",
+        "https://example.com/uploads/bridge.jpg",  # the logo is skipped
+        None,
+    ]
+
+
+def test_extraction_reads_the_page_share_image():
+    html = ARTICLE_HTML.replace(
+        "<title>", '<meta content="/img/budget.jpg" property="og:image" /><title>'
+    )
+
+    result = ExtractionService().extract_from_html(html, url="https://example.com/news/budget")
+
+    assert result.image_url == "https://example.com/img/budget.jpg"

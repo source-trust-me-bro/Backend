@@ -96,6 +96,7 @@ class IngestionService:
         author = entry.author
         published_at = entry.published_at
         language = entry.language or source.get("language") or self.settings.default_language
+        image_url = entry.image_url
 
         if self.settings.fetch_article_content:
             try:
@@ -113,6 +114,7 @@ class IngestionService:
                 author = author or extracted.author
                 published_at = published_at or extracted.published_at
                 language = extracted.language or language
+                image_url = image_url or extracted.image_url
 
         if not title:
             logger.info("Skipping entry without a title: %s", entry.url)
@@ -147,6 +149,7 @@ class IngestionService:
             "fetched_at": utcnow(),
             "topic_ids": topic_ids,
             "embedding": embedding,
+            "image_url": image_url,
         }
         _, created = await self.article_repo.upsert(document)
         return "created" if created else "updated"
@@ -165,6 +168,7 @@ class IngestionService:
         author = payload.author
         published_at = payload.published_at
         language = payload.language or (source or {}).get("language")
+        image_url: str | None = None
 
         if url and content is None and self.settings.fetch_article_content:
             extracted = await self.extraction_service.extract(url, fallback_language=language)
@@ -174,6 +178,7 @@ class IngestionService:
             author = author or extracted.author
             published_at = published_at or extracted.published_at
             language = language or extracted.language
+            image_url = extracted.image_url
 
         if not title:
             raise BadRequestError(
@@ -220,6 +225,7 @@ class IngestionService:
             "fetched_at": utcnow(),
             "topic_ids": topic_ids,
             "embedding": embedding,
+            "image_url": image_url,
         }
         article, _ = await self.article_repo.upsert(document)
         return article

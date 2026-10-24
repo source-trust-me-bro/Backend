@@ -6,11 +6,14 @@ from app.api.deps import (
     get_article_repo,
     get_community_repo,
     get_current_profile,
+    get_related_service,
 )
 from app.repositories.articles import ArticleRepository
+from app.repositories.clicks import with_clicks
 from app.repositories.communities import CommunityRepository
 from app.schemas.article import ArticleSummary
 from app.schemas.base import Page
+from app.services.related import RelatedService
 
 router = APIRouter(prefix="/feeds", tags=["feeds"])
 
@@ -66,3 +69,23 @@ async def following_feed(
     return Page.build(
         [ArticleSummary.model_validate(doc) for doc in documents], total, page, page_size
     )
+
+
+@router.get(
+    "/community/{community_id}",
+    response_model=list[ArticleSummary],
+    summary="Stories for one newsroom community, ranked from the news tree",
+)
+async def community_feed(
+    community_id: str,
+    language: LanguageFilter,
+    limit: int = Query(default=20, ge=1, le=50),
+    _profile: Profile = Depends(get_current_profile),
+    related: RelatedService = Depends(get_related_service),
+) -> list[ArticleSummary]:
+    """``community_id`` is the newsroom's id (``lapland-seasonal``, ``sapmi-north``...), which
+    the newsroom sync stores on every story it copies."""
+
+    found = await related.for_community(community_id, language=language, limit=limit)
+    await with_clicks(related.db, found)
+    return [ArticleSummary.model_validate(doc) for doc in found]

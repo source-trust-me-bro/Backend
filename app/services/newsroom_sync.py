@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 import time
 from typing import Any
 from urllib.parse import urlparse
@@ -23,7 +24,7 @@ from bson import ObjectId
 from pymongo.errors import DuplicateKeyError
 
 from app.core.utils import slugify, utcnow
-from app.repositories.articles import ArticleRepository
+from app.repositories.articles import ArticleRepository, collection_name_for
 from app.repositories.sources import SourceRepository
 from app.repositories.topics import TopicRepository
 from app.services.embedding_service import EmbeddingService
@@ -36,6 +37,19 @@ AUTHOR = "KalevaShorts newsroom"
 TOPIC_REFRESH_SECONDS = 60
 _last_topic_attempt: dict[str, float] = {}
 _background: set[asyncio.Task[None]] = set()
+_SECTION = re.compile(r"^##\s+.*$", re.MULTILINE)
+
+
+def split_story(body: str | None) -> tuple[str | None, str | None]:
+    """A newsroom story is '## What happened' then '## What it means for you', in any language.
+
+    Returns (basic facts, explanation): the first section, and everything after it. A body
+    without at least two sections is all explanation."""
+
+    parts = [part.strip() for part in _SECTION.split(body or "") if part.strip()]
+    if len(parts) >= 2:
+        return parts[0], "\n\n".join(parts[1:])
+    return None, (body or None)
 
 
 async def sync_topic_docs(collection: Any, topics: list[dict[str, Any]]) -> dict[str, ObjectId]:
@@ -239,7 +253,21 @@ class NewsroomSync:
         )
         title = version["headline"]
         summary = version.get("standfirst") or None
-        embedding = await asyncio.to_thread(self.embedding.embed, f"{title}\n\n{summary or ''}")
+        # Embedding every story again on every sync is the slow part: reuse the stored vector
+        # while the text it was computed from is unchanged.
+        existing = await self.articles.database[collection_name_for(language)].find_one(
+            {"url": url}, {"title": 1, "summary": 1, "embedding": 1}
+        )
+        if (
+            existing
+            and existing.get("embedding")
+            and existing.get("title") == title
+            and existing.get("summary") == summary
+        ):
+            embedding = existing["embedding"]
+        else:
+            embedding = await asyncio.to_thread(self.embedding.embed, f"{title}\n\n{summary or ''}")
+        basic_info, explanation = split_story(version.get("body_md"))
         _, created = await self.articles.upsert(
             {
                 "source_id": source["_id"] if source else None,
@@ -257,6 +285,10 @@ class NewsroomSync:
                 "embedding": embedding,
                 "newsroom_story_id": story["story_id"],
                 "community_id": story.get("community_id"),
+                "image_url": story.get("image_url"),
+                "event_id": (story.get("event_ids") or [None])[0],
+                "basic_info": basic_info,
+                "explanation": explanation,
             }
         )
         return created

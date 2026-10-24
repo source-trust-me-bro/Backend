@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 from app.config import Settings, get_settings
 from app.core.exceptions import BadRequestError, UpstreamError
 from app.core.utils import validate_public_url
+from app.services.images import image_from_entry
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +23,7 @@ class FeedEntry:
     published_at: datetime | None = None
     external_id: str | None = None
     language: str | None = None
+    image_url: str | None = None  # a link to the publisher's photo, never a copy
 
 
 class RSSService:
@@ -99,6 +101,7 @@ class RSSService:
             published_at=published_at,
             external_id=(raw.get("id") or url)[:200],
             language=_normalize_feed_language(raw.get("language") or default_language),
+            image_url=image_from_entry(raw, url),
         )
 
 

@@ -10,6 +10,7 @@ from langdetect import DetectorFactory, LangDetectException, detect
 from app.config import Settings, get_settings
 from app.core.exceptions import BadRequestError, UpstreamError
 from app.core.utils import normalize_whitespace, truncate, validate_public_url
+from app.services.images import image_from_page
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +27,7 @@ class ExtractionResult:
     published_at: datetime | None = None
     language: str | None = None
     site_name: str | None = None
+    image_url: str | None = None  # the page's og:image / twitter:image
 
 
 class ExtractionService:
@@ -88,6 +90,7 @@ class ExtractionService:
 
         content = truncate(normalize_whitespace(content), self.settings.max_content_chars)
         result.content = content
+        result.image_url = image_from_page(html, url)
 
         detected = detect_language(
             " ".join(part for part in (result.title, content) if part),

@@ -9,12 +9,14 @@ from app.api.deps import (
     get_article_repo,
     get_current_user,
     get_library_repo,
+    get_related_service,
     require_editor,
 )
 from app.config import Settings, get_settings
 from app.core.exceptions import NotFoundError
 from app.core.utils import utcnow
 from app.repositories.articles import ArticleRepository, tokenize_query
+from app.repositories.clicks import with_clicks
 from app.repositories.library import LibraryRepository
 from app.schemas.article import (
     ArticleDetail,
@@ -24,6 +26,7 @@ from app.schemas.article import (
 )
 from app.schemas.base import Page
 from app.schemas.user import ClerkPrincipal
+from app.services.related import RelatedService
 
 router = APIRouter(prefix="/articles", tags=["articles"])
 
@@ -57,6 +60,7 @@ async def list_articles(
         page_size=page_size,
         sort=sort,
     )
+    await with_clicks(repo.database, documents)
     return Page.build(
         [ArticleSummary.model_validate(doc) for doc in documents], total, page, page_size
     )
@@ -90,6 +94,7 @@ async def trending_articles(
         newest, _ = await repo.list_articles(language=language, page=1, page_size=limit + len(seen))
         picked += [doc for doc in newest if doc["_id"] not in seen][: limit - len(picked)]
 
+    await with_clicks(repo.database, picked)
     return [ArticleSummary.model_validate(doc) for doc in picked]
 
 
@@ -102,25 +107,31 @@ async def get_article(
     article = await repo.get_by_id(article_id)
     if article is None:
         raise NotFoundError(f"Article '{article_id}' was not found.")
+    await with_clicks(repo.database, [article])
     return ArticleDetail.model_validate(article)
 
 
 @router.get(
     "/{article_id}/related",
     response_model=list[ArticleSummary],
-    summary="Articles sharing topics with this article",
+    summary="Related stories from the news tree, each with the reasons it is shown",
 )
 async def get_related_articles(
     article_id: str,
-    limit: int = Query(default=5, ge=1, le=20),
+    limit: int = Query(default=6, ge=1, le=20),
+    community: list[str] = Query(
+        default=[], max_length=20, description="The reader's newsroom communities"
+    ),
     _principal: ClerkPrincipal = Depends(get_current_user),
     repo: ArticleRepository = Depends(get_article_repo),
+    related: RelatedService = Depends(get_related_service),
 ) -> list[ArticleSummary]:
     article = await repo.get_by_id(article_id)
     if article is None:
         raise NotFoundError(f"Article '{article_id}' was not found.")
-    related = await repo.related(article, limit=limit)
-    return [ArticleSummary.model_validate(doc) for doc in related]
+    found = await related.related(article, limit=limit, communities=community)
+    await with_clicks(repo.database, found)
+    return [ArticleSummary.model_validate(doc) for doc in found]
 
 
 @router.get(

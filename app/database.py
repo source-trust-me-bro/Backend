@@ -101,6 +101,12 @@ INDEX_PLAN: dict[str, list[dict[str, Any]]] = {
         {"keys": ["status"]},
         {"keys": ["created_at"]},
     ],
+    # One row per (reader, article, kind of click); per-article totals live in article_stats,
+    # keyed by the article id, so they need no extra index.
+    "article_clicks": [
+        _unique("clerk_user_id", "article_id", "kind"),
+        {"keys": ["kind", "last_at"]},
+    ],
 }
 
 
@@ -112,6 +118,8 @@ ARTICLE_INDEXES: list[dict[str, Any]] = [
     {"keys": ["source_id", "published_at"]},
     {"keys": ["topic_ids", "published_at"]},
     {"keys": ["published_at"]},
+    {"keys": ["event_id"]},  # the same news from other outlets (related stories)
+    {"keys": ["community_id", "published_at"]},  # one community's feed
 ]
 
 
