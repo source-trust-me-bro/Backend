@@ -5,6 +5,7 @@ reference downstream. Reviewer names come from the authenticated account, never 
 request body, so every approval is traceable to a signed-in human.
 """
 
+import logging
 from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, Query
@@ -12,21 +13,48 @@ from pydantic import BaseModel, Field
 
 from app.api.deps import (
     Profile,
+    get_article_repo,
     get_current_profile,
+    get_embedding_service,
+    get_source_repo,
+    get_topic_repo,
     get_user_repo,
     require_admin,
     require_editor,
 )
 from app.config import Settings, get_settings
 from app.core.exceptions import ForbiddenError, NotFoundError
+from app.repositories.articles import ArticleRepository
+from app.repositories.sources import SourceRepository
+from app.repositories.topics import TopicRepository
 from app.repositories.users import UserRepository
+from app.services.embedding_service import EmbeddingService
 from app.services.newsroom_client import NewsroomClient, user_ref
+from app.services.newsroom_sync import NewsroomSync
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/newsroom", tags=["newsroom"])
 
 
 def get_client(settings: Settings = Depends(get_settings)) -> NewsroomClient:
     return NewsroomClient(settings)
+
+
+def get_sync(
+    client: NewsroomClient = Depends(get_client),
+    article_repo: ArticleRepository = Depends(get_article_repo),
+    topic_repo: TopicRepository = Depends(get_topic_repo),
+    source_repo: SourceRepository = Depends(get_source_repo),
+    embedding_service: EmbeddingService = Depends(get_embedding_service),
+) -> NewsroomSync:
+    return NewsroomSync(
+        client=client,
+        article_repo=article_repo,
+        topic_repo=topic_repo,
+        source_repo=source_repo,
+        embedding_service=embedding_service,
+    )
 
 
 def _ref(profile: Profile) -> str:
@@ -53,12 +81,17 @@ class MessageIn(BaseModel):
 class CycleIn(BaseModel):
     community_ids: list[str] | None = None
     use_fixtures: bool = False
+    news_count: Literal[10, 50, 100] | None = None
 
 
 class DecisionIn(BaseModel):
     role: Literal["editor_in_chief", "language_reviewer", "community_reviewer", "subject_expert"]
     decision: Literal["approve", "reject", "request_changes"]
     notes: str = Field(default="", max_length=2000)
+    # Only the editor-in-chief's approval uses this: where the story is published.
+    destinations: list[Literal["dashboard", "community"]] = Field(
+        default_factory=list, max_length=2
+    )
 
 
 class ReviewIn(BaseModel):
@@ -125,13 +158,16 @@ async def join(
 @router.get("/feed", summary="Approved stories for a community")
 async def feed(
     community_id: str | None = Query(default=None),
+    destination: Literal["dashboard", "community"] | None = Query(default=None),
     profile: Profile = Depends(get_current_profile),
     client: NewsroomClient = Depends(get_client),
 ) -> Any:
     target = community_id or (await _member(client, profile)).get("community_id")
     if not target:
         return []
-    return await client.request("GET", f"/feeds/{target}")
+    return await client.request(
+        "GET", f"/feeds/{target}", params={"destination": destination} if destination else None
+    )
 
 
 @router.post("/messages", status_code=201, summary="Ask, send a tip, or request a correction")
@@ -156,6 +192,225 @@ async def my_messages(
     return await client.request("GET", "/community/messages/mine", ref=_ref(profile))
 
 
+# ----------------------------------------------- following, reactions and sharing
+
+
+class FollowIn(BaseModel):
+    kind: Literal["community", "official"]
+    target_id: str = Field(min_length=1, max_length=64)
+
+
+class LanguageIn(BaseModel):
+    language: str = Field(min_length=2, max_length=8)
+    # Other languages the member reads too. Stories in any other language are never shown.
+    also_reads: list[str] | None = Field(default=None, max_length=12)
+
+
+class CommentIn(BaseModel):
+    text: str = Field(min_length=1, max_length=1000)
+    language: str = "en"
+    community_id: str | None = None
+
+
+class ShareIn(BaseModel):
+    platform: Literal["facebook", "x", "whatsapp", "telegram", "linkedin", "email", "copy_link"]
+    community_id: str | None = None
+
+
+class PostSourceIn(BaseModel):
+    name: str = Field(min_length=1, max_length=200)
+    url: str = Field(min_length=1, max_length=2048)
+    official: bool = False
+
+
+class EditorPostIn(BaseModel):
+    headline: str = Field(min_length=1, max_length=200)
+    standfirst: str = Field(default="", max_length=600)
+    body_md: str = Field(min_length=1, max_length=20000)
+    language: str = Field(default="en", max_length=8)
+    # Empty means every community.
+    community_ids: list[str] | None = None
+    destinations: list[Literal["dashboard", "community"]] = Field(
+        default_factory=list, max_length=2
+    )
+    sources: list[PostSourceIn] = Field(default_factory=list, max_length=20)
+
+
+@router.get("/directory", summary="Every community and official account, with your follows")
+async def directory(
+    profile: Profile = Depends(get_current_profile),
+    client: NewsroomClient = Depends(get_client),
+) -> Any:
+    return await client.request("GET", "/directory", ref=_ref(profile))
+
+
+@router.get("/follows", summary="What you follow")
+async def my_follows(
+    profile: Profile = Depends(get_current_profile),
+    client: NewsroomClient = Depends(get_client),
+) -> Any:
+    return await client.request("GET", "/follows/me", ref=_ref(profile))
+
+
+@router.post("/follows", status_code=201, summary="Follow a community or an official account")
+async def follow(
+    payload: FollowIn,
+    profile: Profile = Depends(get_current_profile),
+    client: NewsroomClient = Depends(get_client),
+) -> Any:
+    return await client.request("POST", "/follows/me", ref=_ref(profile), json=payload.model_dump())
+
+
+@router.delete("/follows/{kind}/{target_id}", summary="Stop following")
+async def unfollow(
+    kind: Literal["community", "official"],
+    target_id: str,
+    profile: Profile = Depends(get_current_profile),
+    client: NewsroomClient = Depends(get_client),
+) -> Any:
+    return await client.request("DELETE", f"/follows/me/{kind}/{target_id}", ref=_ref(profile))
+
+
+@router.get("/follows/recommended", summary="What to follow next, with the reasons")
+async def recommended_follows(
+    limit: int = Query(default=8, ge=1, le=30),
+    profile: Profile = Depends(get_current_profile),
+    client: NewsroomClient = Depends(get_client),
+) -> Any:
+    return await client.request(
+        "GET", "/follows/recommended", ref=_ref(profile), params={"limit": limit}
+    )
+
+
+@router.put("/me/language", summary="The languages you read in")
+async def set_language(
+    payload: LanguageIn,
+    profile: Profile = Depends(get_current_profile),
+    client: NewsroomClient = Depends(get_client),
+) -> Any:
+    return await client.request(
+        "PUT", "/members/me/language", ref=_ref(profile), json=payload.model_dump()
+    )
+
+
+@router.get("/feed/following", summary="Stories from what you follow, in your languages")
+async def following_feed(
+    language: str | None = Query(default=None, max_length=8),
+    limit: int = Query(default=50, ge=1, le=200),
+    profile: Profile = Depends(get_current_profile),
+    client: NewsroomClient = Depends(get_client),
+) -> Any:
+    params: dict[str, Any] = {"limit": limit}
+    if language:
+        params["language"] = language
+    return await client.request("GET", "/feed/me", ref=_ref(profile), params=params)
+
+
+@router.get("/top-news", summary="Most engaged stories, in your languages")
+async def top_news(
+    community_id: str | None = Query(default=None),
+    days: int = Query(default=7, ge=1, le=365),
+    limit: int = Query(default=10, ge=1, le=100),
+    profile: Profile = Depends(get_current_profile),
+    client: NewsroomClient = Depends(get_client),
+) -> Any:
+    params: dict[str, Any] = {"days": days, "limit": limit}
+    if community_id:
+        params["community_id"] = community_id
+    return await client.request("GET", "/top-news", ref=_ref(profile), params=params)
+
+
+@router.put("/stories/{story_id}/like", summary="Like a story")
+async def like(
+    story_id: str,
+    profile: Profile = Depends(get_current_profile),
+    client: NewsroomClient = Depends(get_client),
+) -> Any:
+    return await client.request("PUT", f"/stories/{story_id}/like", ref=_ref(profile))
+
+
+@router.delete("/stories/{story_id}/like", summary="Remove your like")
+async def unlike(
+    story_id: str,
+    profile: Profile = Depends(get_current_profile),
+    client: NewsroomClient = Depends(get_client),
+) -> Any:
+    return await client.request("DELETE", f"/stories/{story_id}/like", ref=_ref(profile))
+
+
+@router.get("/stories/{story_id}/comments", summary="Comments on a story")
+async def story_comments(
+    story_id: str,
+    _profile: Profile = Depends(get_current_profile),
+    client: NewsroomClient = Depends(get_client),
+) -> Any:
+    return await client.request("GET", f"/stories/{story_id}/comments")
+
+
+@router.post("/stories/{story_id}/comments", status_code=201, summary="Comment on a story")
+async def add_comment(
+    story_id: str,
+    payload: CommentIn,
+    profile: Profile = Depends(get_current_profile),
+    client: NewsroomClient = Depends(get_client),
+) -> Any:
+    return await client.request(
+        "POST", f"/stories/{story_id}/comments", ref=_ref(profile), json=payload.model_dump()
+    )
+
+
+@router.get("/stories/{story_id}/share-links", summary="Links to share a story")
+async def share_links(
+    story_id: str,
+    _profile: Profile = Depends(get_current_profile),
+    client: NewsroomClient = Depends(get_client),
+) -> Any:
+    return await client.request("GET", f"/stories/{story_id}/share-links")
+
+
+@router.post("/stories/{story_id}/share", status_code=201, summary="Record a share")
+async def share(
+    story_id: str,
+    payload: ShareIn,
+    profile: Profile = Depends(get_current_profile),
+    client: NewsroomClient = Depends(get_client),
+) -> Any:
+    return await client.request(
+        "POST", f"/stories/{story_id}/share", ref=_ref(profile), json=payload.model_dump()
+    )
+
+
+@router.post("/staff/posts", status_code=201, summary="Post a story to communities (editor only)")
+async def editor_post(
+    payload: EditorPostIn,
+    profile: Profile = Depends(require_editor),
+    client: NewsroomClient = Depends(get_client),
+    sync: NewsroomSync = Depends(get_sync),
+) -> Any:
+    """The editor's name comes from the signed-in account, never from the request."""
+
+    body = payload.model_dump()
+    body["editor"] = _display_name(profile)
+    result = await client.request("POST", "/staff/posts", json=body)
+    try:
+        await sync.run()  # show it on the reader dashboard at once; the next sync retries
+    except Exception:
+        logger.warning("Copying published stories to the dashboard failed", exc_info=True)
+    return result
+
+
+@router.get("/dashboard/engagement", summary="Top news, communities and topics (editor only)")
+async def engagement_dashboard(
+    days: int = Query(default=7, ge=1, le=365),
+    limit: int = Query(default=10, ge=1, le=100),
+    _editor: Profile = Depends(require_editor),
+    client: NewsroomClient = Depends(get_client),
+) -> Any:
+    return await client.request(
+        "GET", "/dashboard/engagement", params={"days": days, "limit": limit}
+    )
+
+
 # ---------------------------------------------------------------------- newsroom desk
 
 
@@ -176,6 +431,22 @@ async def stop_cycle(
     client: NewsroomClient = Depends(get_client),
 ) -> Any:
     return await client.request("POST", "/cycle/stop")
+
+
+@router.post("/connector", summary="Link related topics in the topic graph (editor only)")
+async def run_connector(
+    _editor: Profile = Depends(require_editor),
+    client: NewsroomClient = Depends(get_client),
+) -> Any:
+    return await client.request("POST", "/connector/run")
+
+
+@router.get("/overview", summary="Sources, topics and recent cycles (editor only)")
+async def overview(
+    _editor: Profile = Depends(require_editor),
+    client: NewsroomClient = Depends(get_client),
+) -> Any:
+    return await client.request("GET", "/overview")
 
 
 @router.get("/cycle/latest", summary="Status of the latest newsroom cycle (editor only)")
@@ -217,6 +488,7 @@ async def submit_review(
     payload: ReviewIn,
     profile: Profile = Depends(get_current_profile),
     client: NewsroomClient = Depends(get_client),
+    sync: NewsroomSync = Depends(get_sync),
 ) -> Any:
     """The reviewer is always the signed-in account. Editors act as editor-in-chief under
     their own name. Community admins and moderators act in the community roles they were
@@ -231,7 +503,23 @@ async def submit_review(
         else:
             reviewer = f"member:{_ref(profile)}"
         decisions.append({**item.model_dump(), "reviewer": reviewer})
-    return await client.request("POST", f"/review/{pitch_id}", json={"decisions": decisions})
+    result = await client.request("POST", f"/review/{pitch_id}", json={"decisions": decisions})
+    if isinstance(result, dict) and result.get("status") == "published":
+        # Show it on the reader dashboard at once. A failed copy must not undo the publish:
+        # the next sync picks it up.
+        try:
+            await sync.run()
+        except Exception:
+            logger.warning("Copying published stories to the dashboard failed", exc_info=True)
+    return result
+
+
+@router.post("/sync", summary="Copy published stories to the reader dashboard (editor only)")
+async def sync_dashboard(
+    _editor: Profile = Depends(require_editor),
+    sync: NewsroomSync = Depends(get_sync),
+) -> dict[str, int]:
+    return await sync.run()
 
 
 @router.post(

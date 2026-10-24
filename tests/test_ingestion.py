@@ -83,7 +83,7 @@ async def test_ingestion_job_creates_articles(client, app, authenticate, grant_r
         "failed": 0,
     }
 
-    stored = await database["articles"].find_one({"url": "https://example.com/first"})
+    stored = await database["articles_en"].find_one({"url": "https://example.com/first"})
     assert stored is not None
     assert stored["title"] == "First story"
     assert stored["content"] == "Extracted body text for the article."
@@ -105,7 +105,7 @@ async def test_reingestion_updates_instead_of_duplicating(
     assert second.status_code == 201
     assert second.json()["stats"]["updated"] == 2
     assert second.json()["stats"]["created"] == 0
-    assert await database["articles"].count_documents({}) == 2
+    assert await database["articles_en"].count_documents({}) == 2
 
 
 async def test_ingestion_jobs_are_listed(client, app, authenticate, grant_roles):
@@ -166,7 +166,7 @@ async def test_manual_article_with_inline_content(client, app, authenticate, gra
     assert article["url"].startswith("manual://article/")
     assert article["summary"]
 
-    stored = await database["articles"].find_one({"_id": ObjectId(article["id"])})
+    stored = await database["articles_en"].find_one({"_id": ObjectId(article["id"])})
     assert stored["author"] == "Staff Writer"
     assert stored["embedding"]
 

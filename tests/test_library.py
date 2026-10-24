@@ -49,7 +49,7 @@ async def test_saved_listing_paginates_and_skips_deleted_articles(client, databa
     articles = [await make_article(title=f"Story {index}") for index in range(3)]
     for article in articles:
         await client.put(f"/api/v1/library/{article['_id']}/saved", json={"value": True})
-    await database["articles"].delete_one({"_id": articles[0]["_id"]})
+    await database["articles_en"].delete_one({"_id": articles[0]["_id"]})
 
     first_page = await client.get("/api/v1/library/saved", params={"page_size": 1})
     second_page = await client.get("/api/v1/library/saved", params={"page_size": 1, "page": 2})

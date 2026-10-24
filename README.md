@@ -258,7 +258,7 @@ MONGODB_DATABASE=multilingual_news
 CLERK_ISSUER=https://your-instance.clerk.accounts.dev
 CLERK_PUBLISHABLE_KEY=pk_test_your_publishable_key
 CLERK_SECRET_KEY=sk_test_your_secret_key
-NEWS_LANGUAGES=en,fi,sv
+NEWS_LANGUAGES=en,fi,sv,ar,se,uk,ru
 ```
 
 All supported settings are documented in [Configuration reference](#configuration-reference).
@@ -347,7 +347,7 @@ Settings are loaded from environment variables and `.env`. See `.env.example`.
 | `CLERK_ISSUER` | — | Clerk instance issuer |
 | `CLERK_JWKS_URL` | derived | Optional explicit JWKS URL |
 | `CLERK_JWKS_CACHE_SECONDS` | `300` | JWKS cache lifetime |
-| `NEWS_LANGUAGES` | `en,fi,sv` | Comma-separated supported language codes |
+| `NEWS_LANGUAGES` | `en,fi,sv,ar,se,uk,ru` | Comma-separated supported language codes |
 | `DEFAULT_LANGUAGE` | `en` | Preferred language for new profiles |
 | `CORS_ORIGINS` | `http://localhost:3000,http://localhost:5173` | Allowed browser origins |
 | `EMBEDDING_MODEL` | multilingual MiniLM | Sentence-transformers model name |
@@ -372,6 +372,10 @@ Development:
 ```bash
 uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
+
+Using more CPU cores (Windows): `.\scripts\serve_fast.ps1` starts the API with one worker
+process per four logical cores (at most 8; `-Workers 12` to choose). It does not reload on code
+changes, so use `uvicorn ... --reload` while you edit.
 
 Production-style (multiple workers):
 

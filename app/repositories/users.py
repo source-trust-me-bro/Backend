@@ -75,6 +75,12 @@ class UserRepository(BaseRepository):
                 "created_at": now,
             },
         }
+        # Most requests change nothing. A write is the slowest thing a remote database does, so
+        # read first and write only for a new account, changed details or a stale last_seen_at.
+        existing = await self.get_by_clerk_id(principal.sub)
+        if existing is not None and not _needs_refresh(existing, claim_fields, now):
+            return existing
+
         for attempt in range(2):
             try:
                 doc = await self.collection.find_one_and_update(
@@ -123,3 +129,19 @@ class UserRepository(BaseRepository):
             {"clerk_user_id": clerk_user_id},
             {"$set": {"last_seen_at": datetime.now(UTC)}},
         )
+
+
+LAST_SEEN_REFRESH_SECONDS = 300
+
+
+def _needs_refresh(existing: dict[str, Any], claim_fields: dict[str, Any], now: Any) -> bool:
+    """True when the stored profile differs from the token or has not been touched for 5 minutes."""
+
+    if any(existing.get(key) != value for key, value in claim_fields.items()):
+        return True
+    seen = existing.get("last_seen_at")
+    if seen is None:
+        return True
+    if getattr(seen, "tzinfo", None) is None and getattr(now, "tzinfo", None) is not None:
+        seen = seen.replace(tzinfo=now.tzinfo)
+    return (now - seen).total_seconds() > LAST_SEEN_REFRESH_SECONDS

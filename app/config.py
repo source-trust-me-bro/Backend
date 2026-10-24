@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     newsroom_api_key: str = ""
     newsroom_timeout_seconds: float = 150.0
 
-    news_languages: str = "en,fi,sv"
+    news_languages: str = "en,fi,sv,ar,se,uk,ru"
     default_language: str = "en"
 
     embedding_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"

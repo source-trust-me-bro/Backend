@@ -9,6 +9,7 @@ from app.api.deps import (
     get_topic_repo,
     require_editor,
 )
+from app.config import Settings, get_settings
 from app.core.exceptions import NotFoundError
 from app.repositories.communities import CommunityRepository
 from app.repositories.topics import TopicRepository
@@ -21,6 +22,7 @@ from app.schemas.article import (
 from app.schemas.base import Page
 from app.schemas.topic import TopicCreate, TopicNode, TopicOut, TopicUpdate
 from app.schemas.user import ClerkPrincipal
+from app.services.newsroom_sync import auto_sync_topics
 from app.services.search_service import SearchService
 
 router = APIRouter(prefix="/topics", tags=["topics"])
@@ -32,7 +34,10 @@ async def topic_tree(
     language: LanguageFilter,
     _principal: ClerkPrincipal = Depends(get_current_user),
     repo: TopicRepository = Depends(get_topic_repo),
+    settings: Settings = Depends(get_settings),
 ) -> list[TopicNode]:
+    # The newsroom's agents make the topics; this copies them over, so the tree fills itself.
+    await auto_sync_topics(settings, repo)
     documents = await repo.list_all(language=language)
     return [TopicNode.model_validate(node) for node in repo.build_tree(documents)]
 

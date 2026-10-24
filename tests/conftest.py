@@ -3,7 +3,7 @@ import os
 os.environ["STARTUP_DB_CHECK"] = "false"
 os.environ["CLERK_ISSUER"] = "https://test-instance.clerk.accounts.dev"
 os.environ["CLERK_JWKS_URL"] = "https://test-instance.clerk.accounts.dev/.well-known/jwks.json"
-os.environ["NEWS_LANGUAGES"] = "en,fi,sv"
+os.environ["NEWS_LANGUAGES"] = "en,fi,sv,ar,se,uk,ru"
 
 from collections.abc import AsyncIterator, Awaitable, Callable
 from typing import Any
@@ -78,10 +78,11 @@ def grant_roles(database: Any, client: AsyncClient) -> Callable[..., Awaitable[N
 @pytest.fixture
 def make_article(database: Any) -> Callable[..., Awaitable[dict[str, Any]]]:
     async def _make(**overrides: Any) -> dict[str, Any]:
+        from app.repositories.articles import collection_name_for
         from tests.helpers import article_document
 
         document = article_document(**overrides)
-        result = await database["articles"].insert_one(document)
+        result = await database[collection_name_for(document.get("language"))].insert_one(document)
         document["_id"] = result.inserted_id
         return document
 

@@ -162,3 +162,62 @@ def test_slugify_handles_unicode_and_symbols():
     assert slugify("Helsingin Sanomat") == "helsingin-sanomat"
     assert slugify("Ääni") == "aani"
     assert slugify("!!!").startswith("item-")
+
+
+# --------------------- speed: fewer writes, pooled calls
+
+
+async def test_a_repeat_request_does_not_write_to_the_user_profile(database):
+    import asyncio
+    from datetime import timedelta
+
+    from app.repositories.users import UserRepository
+    from app.schemas.user import ClerkPrincipal
+
+    repo = UserRepository(database)
+    principal = ClerkPrincipal(sub="user_a", email="a@example.com", display_name="Ann")
+
+    first = await repo.sync_from_principal(principal, default_language="en")
+    second = await repo.sync_from_principal(principal, default_language="en")
+
+    assert second["updated_at"] == first["updated_at"]  # nothing was written the second time
+
+    await asyncio.sleep(0.02)  # timestamps are stored to the millisecond
+    changed = principal.model_copy(update={"display_name": "Ann Lee"})
+    third = await repo.sync_from_principal(changed, default_language="en")
+    assert third["display_name"] == "Ann Lee" and third["updated_at"] > first["updated_at"]
+
+    # a stale last_seen_at is refreshed
+    stale = third["last_seen_at"] - timedelta(minutes=10)
+    users = database["users"]
+    await users.update_one({"clerk_user_id": "user_a"}, {"$set": {"last_seen_at": stale}})
+    fourth = await repo.sync_from_principal(changed, default_language="en")
+    assert fourth["last_seen_at"] > stale + timedelta(minutes=9)  # refreshed to about now
+
+
+async def test_calls_to_the_newsroom_share_one_connection_pool(monkeypatch):
+    import httpx
+
+    from app.config import Settings
+    from app.services import newsroom_client
+    from app.services.newsroom_client import NewsroomClient, close_newsroom_clients
+
+    created: list[int] = []
+
+    def fake_client(timeout: float) -> httpx.AsyncClient:
+        created.append(1)
+        return httpx.AsyncClient(
+            timeout=timeout,
+            transport=httpx.MockTransport(lambda request: httpx.Response(200, json={"ok": True})),
+        )
+
+    monkeypatch.setattr(newsroom_client, "_new_client", fake_client)
+    client = NewsroomClient(Settings(newsroom_url="http://newsroom.test", newsroom_api_key="k"))
+
+    for _ in range(4):
+        assert await client.request("GET", "/health") == {"ok": True}
+    await close_newsroom_clients()
+    await client.request("GET", "/health")  # after closing, a fresh pool is made
+
+    assert len(created) == 2  # one pool for the four calls, one after it was closed
+    await close_newsroom_clients()

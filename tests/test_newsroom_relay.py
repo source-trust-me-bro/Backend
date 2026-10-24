@@ -319,3 +319,86 @@ async def test_unconfigured_newsroom_is_a_clear_503(client, app):
         NewsroomClient(Settings(newsroom_url=""))
     response = await client.get("/api/v1/newsroom/communities")
     assert response.status_code in {200, 503}
+
+
+# ------------------------------------------------------- following, reactions, sharing
+
+
+async def test_following_calls_carry_only_the_pseudonymous_reference(client, newsroom):
+    ref = user_ref("user_reader_1")
+
+    followed = await client.post(
+        "/api/v1/newsroom/follows", json={"kind": "community", "target_id": "sapmi-north"}
+    )
+    await client.delete("/api/v1/newsroom/follows/official/migri")
+    await client.get("/api/v1/newsroom/follows")
+    await client.get("/api/v1/newsroom/follows/recommended?limit=5")
+    await client.get("/api/v1/newsroom/directory")
+
+    assert followed.status_code == 201
+    sent = [(c["method"], c["path"]) for c in newsroom.calls]
+    assert ("POST", "/follows/me") in sent and ("DELETE", "/follows/me/official/migri") in sent
+    assert ("GET", "/follows/recommended") in sent and ("GET", "/directory") in sent
+    assert all(c["ref"] == ref for c in newsroom.calls if c["path"] != "/communities")
+    assert "user_reader_1" not in str(newsroom.calls)
+
+
+async def test_follow_input_is_validated(client, newsroom):
+    bad_kind = await client.post(
+        "/api/v1/newsroom/follows", json={"kind": "group", "target_id": "x"}
+    )
+    assert bad_kind.status_code == 422
+    assert newsroom.calls == []
+
+
+async def test_the_following_feed_and_reading_language_are_relayed(client, newsroom):
+    await client.put(
+        "/api/v1/newsroom/me/language", json={"language": "ar", "also_reads": ["en"]}
+    )
+    await client.get("/api/v1/newsroom/feed/following?language=ar&limit=20")
+    await client.get("/api/v1/newsroom/top-news?days=3")
+
+    language, feed, top = newsroom.calls[-3:]
+    assert language["path"] == "/members/me/language"
+    assert language["json"] == {"language": "ar", "also_reads": ["en"]}
+    assert feed["path"] == "/feed/me" and feed["ref"] == user_ref("user_reader_1")
+    assert top["path"] == "/top-news" and top["ref"] == user_ref("user_reader_1")
+
+
+async def test_likes_comments_and_shares_are_relayed(client, newsroom):
+    await client.put("/api/v1/newsroom/stories/s1/like")
+    await client.delete("/api/v1/newsroom/stories/s1/like")
+    comment = await client.post("/api/v1/newsroom/stories/s1/comments", json={"text": "Useful"})
+    share = await client.post("/api/v1/newsroom/stories/s1/share", json={"platform": "facebook"})
+    bad = await client.post("/api/v1/newsroom/stories/s1/share", json={"platform": "myspace"})
+
+    assert comment.status_code == 201 and share.status_code == 201 and bad.status_code == 422
+    sent = [(c["method"], c["path"]) for c in newsroom.calls]
+    assert sent == [
+        ("PUT", "/stories/s1/like"),
+        ("DELETE", "/stories/s1/like"),
+        ("POST", "/stories/s1/comments"),
+        ("POST", "/stories/s1/share"),
+    ]
+
+
+async def test_readers_cannot_post_or_see_the_engagement_dashboard(client, newsroom):
+    post = {"headline": "News", "body_md": "Body"}
+
+    assert (await client.post("/api/v1/newsroom/staff/posts", json=post)).status_code == 403
+    assert (await client.get("/api/v1/newsroom/dashboard/engagement")).status_code == 403
+
+
+async def test_an_editor_post_is_signed_with_the_account_name(
+    client, newsroom, authenticate, grant_roles
+):
+    await become_editor(client, authenticate, grant_roles)
+
+    response = await client.post(
+        "/api/v1/newsroom/staff/posts",
+        json={"headline": "News", "body_md": "Body", "editor": "Someone Else"},
+    )
+
+    assert response.status_code == 201
+    post = next(c for c in newsroom.calls if c["path"] == "/staff/posts")
+    assert post["json"]["editor"] == "Test Reader"  # never the typed name

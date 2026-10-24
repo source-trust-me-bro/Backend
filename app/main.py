@@ -14,6 +14,7 @@ from app.api.v1 import (
     follows,
     health,
     ingestion,
+    languages,
     library,
     newsroom,
     sources,
@@ -23,6 +24,8 @@ from app.api.v1 import (
 from app.config import get_settings
 from app.core.exceptions import AppError
 from app.database import close_mongo_connection, connect_to_mongo, ensure_indexes
+from app.repositories.articles import migrate_legacy_articles
+from app.services.newsroom_client import close_newsroom_clients
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +42,9 @@ async def lifespan(app: FastAPI):
         try:
             database = await connect_to_mongo(settings)
             await ensure_indexes(database)
+            moved = await migrate_legacy_articles(database)
+            if moved:
+                logger.info("Moved articles into per-language collections: %s", moved)
             logger.info("Connected to MongoDB database '%s'", database.name)
         except Exception:
             logger.exception(
@@ -47,6 +53,7 @@ async def lifespan(app: FastAPI):
 
     yield
 
+    await close_newsroom_clients()
     await close_mongo_connection()
 
 
@@ -89,6 +96,7 @@ def create_app() -> FastAPI:
     api_router.include_router(sources.router)
     api_router.include_router(ingestion.router)
     api_router.include_router(articles.router)
+    api_router.include_router(languages.router)
     api_router.include_router(topics.router)
     api_router.include_router(topics.search_router)
     api_router.include_router(communities.router)

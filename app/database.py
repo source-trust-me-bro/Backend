@@ -72,13 +72,6 @@ INDEX_PLAN: dict[str, list[dict[str, Any]]] = {
         _unique("feed_url"),
         {"keys": ["language", "active"]},
     ],
-    "articles": [
-        _unique("url"),
-        {"keys": ["source_id", "published_at"]},
-        {"keys": ["language", "published_at"]},
-        {"keys": ["topic_ids", "published_at"]},
-        {"keys": ["published_at"]},
-    ],
     "article_translations": [
         _unique("article_id", "language"),
     ],
@@ -111,10 +104,31 @@ INDEX_PLAN: dict[str, list[dict[str, Any]]] = {
 }
 
 
+# Articles live in one collection per language (articles_en, articles_fi, ...), each with the
+# same indexes. They are created on first use; see ArticleRepository.
+ARTICLE_COLLECTION_PREFIX = "articles_"
+ARTICLE_INDEXES: list[dict[str, Any]] = [
+    _unique("url"),
+    {"keys": ["source_id", "published_at"]},
+    {"keys": ["topic_ids", "published_at"]},
+    {"keys": ["published_at"]},
+]
+
+
+async def _create_indexes(collection: Any, indexes: list[dict[str, Any]]) -> None:
+    for index in indexes:
+        keys = index["keys"]
+        options = {k: v for k, v in index.items() if k != "keys"}
+        await collection.create_index([(field, 1) for field in keys], **options)
+
+
+async def ensure_article_indexes(collection: Any) -> None:
+    await _create_indexes(collection, ARTICLE_INDEXES)
+
+
 async def ensure_indexes(database: AsyncIOMotorDatabase) -> None:
     for collection_name, indexes in INDEX_PLAN.items():
-        collection = database[collection_name]
-        for index in indexes:
-            keys = index["keys"]
-            options = {k: v for k, v in index.items() if k != "keys"}
-            await collection.create_index([(field, 1) for field in keys], **options)
+        await _create_indexes(database[collection_name], indexes)
+    for name in await database.list_collection_names():
+        if name.startswith(ARTICLE_COLLECTION_PREFIX):
+            await ensure_article_indexes(database[name])

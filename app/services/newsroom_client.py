@@ -1,5 +1,6 @@
 """Server-to-server client for the agentic newsroom service."""
 
+import asyncio
 import hashlib
 from typing import Any
 
@@ -7,6 +8,32 @@ import httpx
 
 from app.config import Settings
 from app.core.exceptions import AppError, NotFoundError, UpstreamError
+
+_clients: dict[tuple[str, int], httpx.AsyncClient] = {}
+
+
+def _new_client(timeout: float) -> httpx.AsyncClient:
+    return httpx.AsyncClient(
+        timeout=timeout, limits=httpx.Limits(max_keepalive_connections=20, max_connections=100)
+    )
+
+
+def _shared_client(base: str, timeout: float) -> httpx.AsyncClient:
+    """One connection pool per event loop, kept alive between requests. A new client for every
+    call means a new connection every time."""
+
+    key = (base, id(asyncio.get_running_loop()))
+    client = _clients.get(key)
+    if client is None or client.is_closed:
+        client = _clients[key] = _new_client(timeout)
+    return client
+
+
+async def close_newsroom_clients() -> None:
+    clients = list(_clients.values())
+    _clients.clear()
+    for client in clients:
+        await client.aclose()
 
 
 def user_ref(clerk_user_id: str) -> str:
@@ -40,10 +67,9 @@ class NewsroomClient:
         if ref:
             headers["X-User-Ref"] = ref
         try:
-            async with httpx.AsyncClient(timeout=self._timeout) as client:
-                response = await client.request(
-                    method, f"{self._base}{path}", headers=headers, json=json, params=params
-                )
+            response = await _shared_client(self._base, self._timeout).request(
+                method, f"{self._base}{path}", headers=headers, json=json, params=params
+            )
         except httpx.HTTPError as exc:
             raise UpstreamError(
                 "The newsroom service could not be reached.",
