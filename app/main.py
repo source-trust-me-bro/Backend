@@ -6,7 +6,19 @@ from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.api.v1 import articles, communities, feeds, health, ingestion, sources, topics, users
+from app.api.v1 import (
+    articles,
+    communities,
+    feedback,
+    feeds,
+    follows,
+    health,
+    ingestion,
+    library,
+    sources,
+    topics,
+    users,
+)
 from app.config import get_settings
 from app.core.exceptions import AppError
 from app.database import close_mongo_connection, connect_to_mongo, ensure_indexes
@@ -80,6 +92,9 @@ def create_app() -> FastAPI:
     api_router.include_router(topics.search_router)
     api_router.include_router(communities.router)
     api_router.include_router(feeds.router)
+    api_router.include_router(library.router)
+    api_router.include_router(follows.router)
+    api_router.include_router(feedback.router)
     application.include_router(api_router)
 
     @application.get("/", include_in_schema=False)

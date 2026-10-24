@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from typing import Any
 
 from pymongo import ReturnDocument
@@ -45,6 +46,13 @@ class SourceRepository(BaseRepository):
             .limit(page_size)
         )
         return [doc async for doc in cursor], total
+
+    async def get_many(self, source_ids: Sequence[str]) -> Sequence[dict[str, Any]]:
+        object_ids = [oid for oid in (to_object_id(value) for value in source_ids) if oid]
+        if not object_ids:
+            return []
+        cursor = self.collection.find({"_id": {"$in": object_ids}}).sort([("name", 1)])
+        return [doc async for doc in cursor]
 
     async def update(self, source_id: str, fields: dict[str, Any]) -> dict[str, Any] | None:
         object_id = to_object_id(source_id)

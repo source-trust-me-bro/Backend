@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     clerk_issuer: str = ""
     clerk_jwks_url: str = ""
     clerk_jwks_cache_seconds: int = 300
+    # Clerk session tokens live about a minute, so tolerance beyond a few seconds only
+    # makes sense on a development machine with a drifting clock.
+    clerk_clock_skew_seconds: int = 30
 
     news_languages: str = "en,fi,sv"
     default_language: str = "en"
@@ -56,6 +59,15 @@ class Settings(BaseSettings):
     @property
     def cors_origin_list(self) -> list[str]:
         return [item.strip() for item in self.cors_origins.split(",") if item.strip()]
+
+    @property
+    def jwt_leeway_seconds(self) -> int:
+        """Allowed clock skew when validating tokens; capped outside development."""
+
+        requested = max(0, self.clerk_clock_skew_seconds)
+        if self.app_env.lower() in {"development", "dev", "local", "test"}:
+            return requested
+        return min(requested, 30)
 
     @property
     def jwks_url(self) -> str:

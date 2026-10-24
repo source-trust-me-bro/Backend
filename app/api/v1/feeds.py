@@ -46,3 +46,23 @@ async def personalized_feed(
     return Page.build(
         [ArticleSummary.model_validate(doc) for doc in documents], total, page, page_size
     )
+
+
+@router.get(
+    "/following",
+    response_model=Page[ArticleSummary],
+    summary="Newest articles from the news sources the caller follows",
+)
+async def following_feed(
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=100),
+    profile: Profile = Depends(get_current_profile),
+    article_repo: ArticleRepository = Depends(get_article_repo),
+) -> Page[ArticleSummary]:
+    source_ids = [str(value) for value in profile.get("followed_source_ids") or []]
+    documents, total = await article_repo.list_articles(
+        source_ids=source_ids, page=page, page_size=page_size
+    )
+    return Page.build(
+        [ArticleSummary.model_validate(doc) for doc in documents], total, page, page_size
+    )

@@ -12,11 +12,14 @@ from app.core.security import get_current_user
 from app.database import get_database
 from app.repositories.articles import ArticleRepository
 from app.repositories.communities import CommunityRepository
+from app.repositories.feedback import FeedbackRepository
 from app.repositories.ingestion_jobs import IngestionJobRepository
+from app.repositories.library import LibraryRepository
 from app.repositories.sources import SourceRepository
 from app.repositories.topics import TopicRepository
 from app.repositories.users import UserRepository
 from app.schemas.user import ClerkPrincipal
+from app.services.clerk_service import fetch_clerk_user
 from app.services.embedding_service import EmbeddingService
 from app.services.extraction_service import ExtractionService
 from app.services.ingestion_service import IngestionService
@@ -46,6 +49,14 @@ def get_community_repo(database: Database) -> CommunityRepository:
 
 def get_article_repo(database: Database) -> ArticleRepository:
     return ArticleRepository(database)
+
+
+def get_library_repo(database: Database) -> LibraryRepository:
+    return LibraryRepository(database)
+
+
+def get_feedback_repo(database: Database) -> FeedbackRepository:
+    return FeedbackRepository(database)
 
 
 def get_job_repo(database: Database) -> IngestionJobRepository:
@@ -108,6 +119,19 @@ async def get_current_profile(
     settings: Settings = Depends(get_settings),
 ) -> Profile:
     """Return the local profile, provisioning it on first authentication."""
+
+    # Clerk's default session token only carries `sub`, so look up the email and name.
+    if principal.email is None:
+        directory_entry = await fetch_clerk_user(principal.sub, settings)
+        if directory_entry is not None:
+            principal = principal.model_copy(
+                update={
+                    "email": directory_entry.email,
+                    "display_name": principal.display_name or directory_entry.display_name,
+                    "username": principal.username or directory_entry.username,
+                    "image_url": principal.image_url or directory_entry.image_url,
+                }
+            )
 
     return await user_repo.sync_from_principal(
         principal, default_language=settings.default_language

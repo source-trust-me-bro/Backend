@@ -91,3 +91,23 @@ async def test_admin_can_update_own_roles_via_patch_me(client, authenticate, gra
     response = await client.patch("/api/v1/users/me", json={"roles": ["reader", "editor", "admin"]})
     assert response.status_code == 200
     assert sorted(response.json()["roles"]) == ["admin", "editor", "reader"]
+
+
+async def test_profile_sync_keeps_stored_email_when_claims_are_missing(
+    database, app, authenticate
+) -> None:
+    from httpx import ASGITransport, AsyncClient
+
+    from app.core.security import get_current_user
+    from app.schemas.user import ClerkPrincipal
+
+    authenticate(sub="user_keep", email="keep@example.com", display_name="Keeper")
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as http:
+        first = await http.get("/api/v1/users/me")
+        assert first.json()["email"] == "keep@example.com"
+
+        app.dependency_overrides[get_current_user] = lambda: ClerkPrincipal(sub="user_keep")
+        second = await http.get("/api/v1/users/me")
+
+    assert second.json()["email"] == "keep@example.com"
+    assert second.json()["display_name"] == "Keeper"

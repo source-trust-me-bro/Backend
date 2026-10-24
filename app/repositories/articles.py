@@ -2,6 +2,7 @@ import re
 from datetime import datetime
 from typing import Any
 
+from bson import ObjectId
 from pymongo.errors import DuplicateKeyError
 
 from app.core.exceptions import ConflictError
@@ -55,6 +56,7 @@ class ArticleRepository(BaseRepository):
         *,
         language: str | None = None,
         source_id: str | None = None,
+        source_ids: list[str] | None = None,
         topic_ids: list[str] | None = None,
         tokens: list[str] | None = None,
         published_after: datetime | None = None,
@@ -67,6 +69,7 @@ class ArticleRepository(BaseRepository):
         filters = build_article_filters(
             language=language,
             source_id=source_id,
+            source_ids=source_ids,
             topic_ids=topic_ids,
             tokens=tokens,
             published_after=published_after,
@@ -81,6 +84,18 @@ class ArticleRepository(BaseRepository):
             .limit(page_size)
         )
         return [doc async for doc in cursor], total
+
+    async def existing_ids(self, ids: list[ObjectId]) -> set[ObjectId]:
+        if not ids:
+            return set()
+        cursor = self.collection.find({"_id": {"$in": ids}}, {"_id": 1})
+        return {doc["_id"] async for doc in cursor}
+
+    async def summaries_by_ids(self, ids: list[ObjectId]) -> dict[ObjectId, dict[str, Any]]:
+        if not ids:
+            return {}
+        cursor = self.collection.find({"_id": {"$in": ids}}, SUMMARY_PROJECTION)
+        return {doc["_id"]: doc async for doc in cursor}
 
     async def related(self, article: dict[str, Any], *, limit: int = 5) -> list[dict[str, Any]]:
         filters: dict[str, Any] = {
@@ -160,6 +175,7 @@ def build_article_filters(
     *,
     language: str | None = None,
     source_id: str | None = None,
+    source_ids: list[str] | None = None,
     topic_ids: list[str] | None = None,
     tokens: list[str] | None = None,
     published_after: datetime | None = None,
@@ -169,7 +185,13 @@ def build_article_filters(
     filters: dict[str, Any] = {}
     if language:
         filters["language"] = language
-    if source_id:
+    if source_ids is not None:
+        allowed = [oid for oid in (to_object_id(value) for value in source_ids) if oid is not None]
+        if source_id:
+            single = to_object_id(source_id)
+            allowed = [oid for oid in allowed if oid == single]
+        filters["source_id"] = {"$in": allowed}
+    elif source_id:
         object_id = to_object_id(source_id)
         filters["source_id"] = object_id if object_id is not None else {"$in": []}
     if topic_ids is not None:

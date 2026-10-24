@@ -24,6 +24,7 @@ class UserProfile(MongoBaseModel):
     preferred_language: str = "en"
     community_id: OptionalObjectIdStr = None
     topic_ids: list[str] = Field(default_factory=list)
+    followed_source_ids: list[str] = Field(default_factory=list)
     created_at: datetime
     updated_at: datetime
     last_seen_at: datetime | None = None

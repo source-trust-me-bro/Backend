@@ -92,7 +92,7 @@ def verify_clerk_token(token: str, settings: Settings) -> ClerkPrincipal:
                 "verify_aud": False,
                 "require": ["exp", "iat", "sub", "iss"],
             },
-            leeway=30,
+            leeway=settings.jwt_leeway_seconds,
         )
     except (PyJWKClientError, InvalidTokenError) as exc:
         logger.info("Rejected Clerk token: %s", exc)

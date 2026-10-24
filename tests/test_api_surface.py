@@ -7,6 +7,7 @@ REQUIRED_ENDPOINTS = {
     "/api/v1/ingestion/jobs": {"get", "post"},
     "/api/v1/ingestion/articles": {"post"},
     "/api/v1/articles": {"get"},
+    "/api/v1/articles/trending": {"get"},
     "/api/v1/articles/{article_id}": {"get"},
     "/api/v1/articles/{article_id}/related": {"get"},
     "/api/v1/articles/{article_id}/translations": {"get", "post"},
@@ -19,6 +20,17 @@ REQUIRED_ENDPOINTS = {
     "/api/v1/communities/{community_id}": {"get", "patch"},
     "/api/v1/communities/{community_id}/feed": {"get"},
     "/api/v1/feeds/personalized": {"get"},
+    "/api/v1/feeds/following": {"get"},
+    "/api/v1/library/state": {"get"},
+    "/api/v1/library/saved": {"get"},
+    "/api/v1/library/downloaded": {"get", "delete"},
+    "/api/v1/library/history": {"get", "delete"},
+    "/api/v1/library/{article_id}/saved": {"put"},
+    "/api/v1/library/{article_id}/downloaded": {"put"},
+    "/api/v1/library/{article_id}/read": {"post"},
+    "/api/v1/follows/sources": {"get"},
+    "/api/v1/follows/sources/{source_id}": {"put"},
+    "/api/v1/feedback": {"get", "post"},
 }
 
 

@@ -431,6 +431,7 @@ token.
 | GET | `/ingestion/jobs` | Editor | List jobs |
 | POST | `/ingestion/articles` | Editor | Ingest one article by URL or inline content |
 | GET | `/articles` | Reader | Filter, paginate, and keyword-search articles |
+| GET | `/articles/trending` | Reader | Most-read articles this week, padded with the newest (`limit`, `language`) |
 | GET | `/articles/{id}` | Reader | Article detail |
 | GET | `/articles/{id}/related` | Reader | Related articles by shared topics |
 | GET | `/articles/{id}/translations` | Reader | Stored translations |
@@ -446,6 +447,17 @@ token.
 | PATCH | `/communities/{id}` | Editor | Update topics and editors |
 | GET | `/communities/{id}/feed` | Reader | Community-curated feed |
 | GET | `/feeds/personalized` | Reader | Personalized feed |
+| GET | `/feeds/following` | Reader | Newest articles from followed sources |
+| GET | `/library/state` | Reader | Ids of saved and downloaded articles |
+| GET | `/library/saved`, `/library/downloaded`, `/library/history` | Reader | Paginated article lists |
+| PUT | `/library/{article_id}/saved` | Reader | Save or unsave (`{"value": bool}`) |
+| PUT | `/library/{article_id}/downloaded` | Reader | Mark or unmark as downloaded |
+| POST | `/library/{article_id}/read` | Reader | Record a read (history and trending) |
+| DELETE | `/library/history`, `/library/downloaded` | Reader | Clear history or downloads |
+| GET | `/follows/sources` | Reader | Sources the caller follows |
+| PUT | `/follows/sources/{source_id}` | Reader | Follow or unfollow a source |
+| POST | `/feedback` | Reader | Send feedback to the team |
+| GET | `/feedback` | Editor | List feedback, newest first |
 
 ## Example requests
 

@@ -32,11 +32,19 @@ class UserRepository(BaseRepository):
         """Provision the local profile on first sight and refresh claim-derived fields."""
 
         now = utcnow()
+        # Never overwrite stored values with None when the token lacks a claim.
+        claim_fields = {
+            key: value
+            for key, value in (
+                ("email", principal.email),
+                ("display_name", principal.display_name),
+                ("image_url", principal.image_url),
+            )
+            if value is not None
+        }
         update = {
             "$set": {
-                "email": principal.email,
-                "display_name": principal.display_name,
-                "image_url": principal.image_url,
+                **claim_fields,
                 "last_seen_at": now,
                 "updated_at": now,
             },
@@ -46,6 +54,7 @@ class UserRepository(BaseRepository):
                 "preferred_language": default_language,
                 "community_id": None,
                 "topic_ids": [],
+                "followed_source_ids": [],
                 "created_at": now,
             },
         }
@@ -76,6 +85,16 @@ class UserRepository(BaseRepository):
         return await self.collection.find_one_and_update(
             {"clerk_user_id": clerk_user_id},
             {"$set": fields},
+            return_document=ReturnDocument.AFTER,
+        )
+
+    async def set_followed_source(
+        self, clerk_user_id: str, source_id: str, value: bool
+    ) -> dict[str, Any] | None:
+        operator = "$addToSet" if value else "$pull"
+        return await self.collection.find_one_and_update(
+            {"clerk_user_id": clerk_user_id},
+            {operator: {"followed_source_ids": source_id}, "$set": {"updated_at": utcnow()}},
             return_document=ReturnDocument.AFTER,
         )
 

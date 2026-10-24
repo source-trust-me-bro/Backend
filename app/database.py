@@ -93,6 +93,16 @@ INDEX_PLAN: dict[str, list[dict[str, Any]]] = {
         {"keys": ["editor_user_ids"]},
         {"keys": ["topic_ids"]},
     ],
+    "user_articles": [
+        _unique("clerk_user_id", "article_id"),
+        {"keys": ["clerk_user_id", "saved", "saved_at"]},
+        {"keys": ["clerk_user_id", "downloaded", "downloaded_at"]},
+        {"keys": ["clerk_user_id", "last_read_at"]},
+        {"keys": ["last_read_at"]},
+    ],
+    "feedback": [
+        {"keys": ["created_at"]},
+    ],
     "ingestion_jobs": [
         {"keys": ["source_id", "created_at"]},
         {"keys": ["status"]},

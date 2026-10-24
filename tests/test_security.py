@@ -109,3 +109,34 @@ async def test_api_rejects_malformed_token(app, client):
     )
     assert response.status_code == 401
     assert response.json()["code"] == "unauthorized"
+
+
+async def test_clerk_user_lookup_maps_primary_email_and_name() -> None:
+    from app.services.clerk_service import principal_from_user
+
+    principal = principal_from_user(
+        {
+            "id": "user_1",
+            "first_name": "Aino",
+            "last_name": "Virtanen",
+            "username": "aino",
+            "image_url": "https://img.example/a.png",
+            "primary_email_address_id": "idn_2",
+            "email_addresses": [
+                {"id": "idn_1", "email_address": "old@example.com"},
+                {"id": "idn_2", "email_address": "aino@example.com"},
+            ],
+        }
+    )
+
+    assert principal.sub == "user_1"
+    assert principal.email == "aino@example.com"
+    assert principal.display_name == "Aino Virtanen"
+
+
+def test_jwt_leeway_is_capped_outside_development() -> None:
+    from app.config import Settings
+
+    assert Settings(app_env="development", clerk_clock_skew_seconds=300).jwt_leeway_seconds == 300
+    assert Settings(app_env="production", clerk_clock_skew_seconds=300).jwt_leeway_seconds == 30
+    assert Settings(app_env="production", clerk_clock_skew_seconds=10).jwt_leeway_seconds == 10
