@@ -86,6 +86,7 @@ INDEX_PLAN: dict[str, list[dict[str, Any]]] = {
         _unique("slug"),
         {"keys": ["parent_id"]},
         {"keys": ["language"]},
+        {"keys": ["branches"]},
     ],
     "communities": [
         _unique("slug"),
@@ -108,3 +109,23 @@ async def ensure_indexes(database: AsyncIOMotorDatabase) -> None:
             keys = index["keys"]
             options = {k: v for k, v in index.items() if k != "keys"}
             await collection.create_index([(field, 1) for field in keys], **options)
+
+
+async def backfill_topic_branches(database: AsyncIOMotorDatabase) -> None:
+    """Migration 001: give every legacy topic an empty `branches` list.
+
+    Topic-to-topic relationships are stored symmetrically on both documents.
+    New topics always get the field up front; this backfill keeps older records
+    consistent and is idempotent.
+    """
+
+    await database["topics"].update_many(
+        {"branches": {"$exists": False}},
+        {"$set": {"branches": []}},
+    )
+
+
+async def run_migrations(database: AsyncIOMotorDatabase) -> None:
+    """Apply idempotent, startup-safe data migrations in order."""
+
+    await backfill_topic_branches(database)

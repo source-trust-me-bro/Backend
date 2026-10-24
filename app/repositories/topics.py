@@ -54,6 +54,57 @@ class TopicRepository(BaseRepository):
         except DuplicateKeyError as exc:
             raise ConflictError("A topic with this slug already exists.") from exc
 
+    async def add_branch(self, topic_id: str, branch_id: str) -> dict[str, Any]:
+        """Link two topics as semantically related branches.
+
+        The relationship is stored symmetrically on both topic documents. Writes
+        are applied in two steps and compensated (rolled back) when the second
+        write fails, so both sides always end up consistent.
+        """
+
+        object_id = require_object_id(topic_id)
+        branch_object_id = require_object_id(branch_id, field="branch_id")
+        if object_id == branch_object_id:
+            raise BadRequestError("A topic cannot reference itself as a branch.")
+        topic = await self.get_by_id(object_id)
+        if topic is None:
+            raise NotFoundError(f"Topic '{topic_id}' was not found.")
+        branch = await self.get_by_id(branch_object_id)
+        if branch is None:
+            raise NotFoundError(f"Topic '{branch_id}' was not found.")
+
+        missing_here = branch_object_id not in (topic.get("branches") or [])
+        missing_there = object_id not in (branch.get("branches") or [])
+        if not missing_here and not missing_there:
+            return topic
+
+        if missing_here:
+            await self._add_branch_write(object_id, branch_object_id)
+        if missing_there:
+            try:
+                await self._add_branch_write(branch_object_id, object_id)
+            except Exception:
+                if missing_here:
+                    await self._remove_branch_write(object_id, branch_object_id)
+                raise
+
+        refreshed = await self.get_by_id(object_id)
+        if refreshed is None:
+            raise NotFoundError(f"Topic '{topic_id}' was not found.")
+        return refreshed
+
+    async def _add_branch_write(self, topic_id: Any, branch_object_id: Any) -> None:
+        await self.collection.update_one(
+            {"_id": topic_id},
+            {"$addToSet": {"branches": branch_object_id}, "$set": {"updated_at": utcnow()}},
+        )
+
+    async def _remove_branch_write(self, topic_id: Any, branch_object_id: Any) -> None:
+        await self.collection.update_one(
+            {"_id": topic_id},
+            {"$pull": {"branches": branch_object_id}, "$set": {"updated_at": utcnow()}},
+        )
+
     async def list_all(self, *, language: str | None = None) -> list[dict[str, Any]]:
         filters: dict[str, Any] = {}
         if language:

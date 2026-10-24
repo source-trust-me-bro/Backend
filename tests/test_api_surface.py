@@ -13,6 +13,7 @@ REQUIRED_ENDPOINTS = {
     "/api/v1/topics/tree": {"get"},
     "/api/v1/topics": {"post"},
     "/api/v1/topics/{topic_id}": {"patch"},
+    "/api/v1/topics/{topic_id}/branches": {"post"},
     "/api/v1/search": {"get"},
     "/api/v1/search/semantic": {"post"},
     "/api/v1/communities": {"get", "post"},

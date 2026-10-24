@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 from app.api.v1 import articles, communities, feeds, health, ingestion, sources, topics, users
 from app.config import get_settings
 from app.core.exceptions import AppError
-from app.database import close_mongo_connection, connect_to_mongo, ensure_indexes
+from app.database import close_mongo_connection, connect_to_mongo, ensure_indexes, run_migrations
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +26,7 @@ async def lifespan(app: FastAPI):
         try:
             database = await connect_to_mongo(settings)
             await ensure_indexes(database)
+            await run_migrations(database)
             logger.info("Connected to MongoDB database '%s'", database.name)
         except Exception:
             logger.exception(

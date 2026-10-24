@@ -19,7 +19,7 @@ from app.schemas.article import (
     SemanticSearchResponse,
 )
 from app.schemas.base import Page
-from app.schemas.topic import TopicCreate, TopicNode, TopicOut, TopicUpdate
+from app.schemas.topic import TopicBranchCreate, TopicCreate, TopicNode, TopicOut, TopicUpdate
 from app.schemas.user import ClerkPrincipal
 from app.services.search_service import SearchService
 
@@ -63,6 +63,28 @@ async def update_topic(
     updated = await repo.update(topic_id, fields) if fields else await repo.get_by_id(topic_id)
     if updated is None:
         raise NotFoundError(f"Topic '{topic_id}' was not found.")
+    return TopicOut.model_validate(updated)
+
+
+@router.post(
+    "/{topic_id}/branches",
+    response_model=TopicOut,
+    summary="Link two topics as related branches (editor only)",
+)
+async def add_topic_branch(
+    topic_id: str,
+    payload: TopicBranchCreate,
+    _editor: Profile = Depends(require_editor),
+    repo: TopicRepository = Depends(get_topic_repo),
+) -> TopicOut:
+    """Create a symmetric topic-to-topic relationship.
+
+    The operation is idempotent: linking two topics that are already linked
+    returns the same representation without changing anything. Self-links and
+    unknown topic IDs are rejected.
+    """
+
+    updated = await repo.add_branch(topic_id, payload.branch_id)
     return TopicOut.model_validate(updated)
 
 

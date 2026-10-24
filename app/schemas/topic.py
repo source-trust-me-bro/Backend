@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, field_validator
 
-from app.schemas.base import LanguageCode, MongoBaseModel, OptionalObjectIdStr
+from app.schemas.base import LanguageCode, MongoBaseModel, ObjectIdList, OptionalObjectIdStr
 
 
 class TopicCreate(BaseModel):
@@ -37,6 +37,10 @@ class TopicUpdate(BaseModel):
         return sorted(cleaned)
 
 
+class TopicBranchCreate(BaseModel):
+    branch_id: str
+
+
 class TopicOut(MongoBaseModel):
     name: str
     slug: str
@@ -44,6 +48,7 @@ class TopicOut(MongoBaseModel):
     language: str
     description: str | None = None
     keywords: list[str] = Field(default_factory=list)
+    branches: ObjectIdList = Field(default_factory=list)
     created_at: datetime
     updated_at: datetime
 

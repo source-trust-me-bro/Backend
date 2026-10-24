@@ -101,7 +101,7 @@ multilingual-news/
 │       ├── topics.py
 │       ├── communities.py
 │       └── ingestion_jobs.py
-├── tests/                       # pytest suite (76 tests, no external services)
+├── tests/                       # pytest suite (82 tests, no external services)
 ├── .github/workflows/ci.yml
 ├── .env.example
 ├── pyproject.toml
@@ -438,6 +438,7 @@ token.
 | GET | `/topics/tree` | Reader | Nested topic tree |
 | POST | `/topics` | Editor | Create a topic |
 | PATCH | `/topics/{id}` | Editor | Update a topic |
+| POST | `/topics/{id}/branches` | Editor | Link two topics as related branches |
 | GET | `/search` | Reader | Keyword search (`q` required) |
 | POST | `/search/semantic` | Reader | Semantic search |
 | POST | `/communities` | Editor | Create a community |
@@ -469,6 +470,11 @@ curl -H "Authorization: Bearer $TOKEN" "$API/search?q=climate&language=en"
 curl -X POST "$API/search/semantic" \
   -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
   -d '{"query":"climate policy","language":"en","limit":10}'
+
+# Link two topics as semantically related branches (idempotent, symmetric)
+curl -X POST "$API/topics/<topic_id>/branches" \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"branch_id":"<other_topic_id>"}'
 ```
 
 Errors use a consistent shape:
@@ -476,6 +482,22 @@ Errors use a consistent shape:
 ```json
 {"detail": "Article '...' was not found.", "code": "not_found"}
 ```
+
+## Topic relationships (`branches`)
+
+A topic can list related topics under `branches`, exposed as a list of topic ID strings in
+every topic representation (`TopicOut`, the topic tree nodes, and the responses below).
+Relationships are symmetric and deduplicated: linking A to B also adds A to B's `branches`,
+and both sides always reference existing topics.
+
+Other services — such as the agentic newsroom — create relationships through the API without
+touching the database:
+
+`POST /api/v1/topics/{topic_id}/branches` (editor role required) with body
+`{"branch_id": "<other topic id>"}` returns the updated topic. The call is idempotent: linking
+already-linked topics returns the same representation without a change, self-links are rejected
+with `400`, and unknown or malformed IDs with `404`. Both sides are written with rollback, so a
+failed request never leaves one-sided data.
 
 ## Ingestion pipeline
 
@@ -532,7 +554,9 @@ backends.
 ## Data model and indexes
 
 Collections: `users`, `sources`, `articles`, `article_translations`, `topics`, `communities`,
-and `ingestion_jobs`.
+and `ingestion_jobs`. Topics additionally carry a `branches` field: the IDs of other topics
+they are semantically related to, stored symmetrically on both documents (see
+[Topic relationships](#topic-relationships-branches)).
 
 Indexes created at startup:
 
@@ -541,7 +565,7 @@ Indexes created at startup:
 - `articles.url` (unique), plus `(source_id, published_at)`, `(language, published_at)`,
   `(topic_ids, published_at)`, and `published_at`
 - `article_translations (article_id, language)` (unique)
-- `topics.slug` (unique), `topics.parent_id`, `topics.language`
+- `topics.slug` (unique), `topics.parent_id`, `topics.language`, `topics.branches`
 - `communities.slug` (unique), `communities.language`, `editor_user_ids`, `topic_ids`
 - `ingestion_jobs (source_id, created_at)`, `status`, `created_at`
 
@@ -561,8 +585,10 @@ ruff format .
 
 The suite covers Clerk RS256 verification (valid, expired, wrong issuer, wrong algorithm,
 missing claims), lazy profile provisioning, role escalation attempts, CRUD for every
-resource, feed filtering, ingestion success/update/failure paths, RSS parsing, article
-extraction, embeddings, URL safety, and the required API surface.
+resource, topic branch relationships (symmetry, self-link/unknown-ID rejection, idempotency,
+compensation on write failure, migration backfill), feed filtering, ingestion
+success/update/failure paths, RSS parsing, article extraction, embeddings, URL safety, and
+the required API surface.
 
 CI (`.github/workflows/ci.yml`) runs Ruff lint, Ruff format check, and pytest on Python
 3.11, 3.12, and 3.13.
