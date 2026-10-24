@@ -16,6 +16,23 @@ class UserRepository(BaseRepository):
     async def get_by_clerk_id(self, clerk_user_id: str) -> dict[str, Any] | None:
         return await self.collection.find_one({"clerk_user_id": clerk_user_id})
 
+    async def search_by_name(self, query: str, *, limit: int = 8) -> list[dict[str, Any]]:
+        """Accounts whose display name contains ``query`` (case-insensitive).
+
+        Used server-side so editors and community admins can find the person they want to
+        appoint as a community moderator or admin.
+        """
+
+        import re
+
+        pattern = re.escape(query.strip())
+        cursor = (
+            self.collection.find({"display_name": {"$regex": pattern, "$options": "i"}})
+            .sort("display_name", 1)
+            .limit(limit)
+        )
+        return [doc async for doc in cursor]
+
     async def get_by_ids(self, user_ids: list[str]) -> list[dict[str, Any]]:
         object_ids = [ObjectId(value) for value in user_ids if ObjectId.is_valid(value)]
         if not object_ids:

@@ -36,6 +36,12 @@ class Settings(BaseSettings):
     # makes sense on a development machine with a drifting clock.
     clerk_clock_skew_seconds: int = 30
 
+    # The agentic newsroom service (community stories, review desk). Server-to-server only:
+    # browsers never see this key, and user identity is passed as a pseudonymous reference.
+    newsroom_url: str = ""
+    newsroom_api_key: str = ""
+    newsroom_timeout_seconds: float = 150.0
+
     news_languages: str = "en,fi,sv"
     default_language: str = "en"
 

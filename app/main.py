@@ -15,6 +15,7 @@ from app.api.v1 import (
     health,
     ingestion,
     library,
+    newsroom,
     sources,
     topics,
     users,
@@ -95,6 +96,7 @@ def create_app() -> FastAPI:
     api_router.include_router(library.router)
     api_router.include_router(follows.router)
     api_router.include_router(feedback.router)
+    api_router.include_router(newsroom.router)
     application.include_router(api_router)
 
     @application.get("/", include_in_schema=False)
