@@ -1,0 +1,1922 @@
+{
+  "ok": false,
+  "strict": false,
+  "browserSkipped": false,
+  "lint": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 9,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "timeline_track_too_dense",
+        "severity": "warning",
+        "message": "Track 0 has 8 timed elements in this HTML file. Smaller sub-compositions keep timelines easier to read, iterate on, and diff.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "D:\\Backend\\brag-output\\composition\\index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move coherent scene groups into separate .html files under compositions/ and mount them from the parent with data-composition-src so the timeline stays easier to inspect, revise, and validate."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"s1\"> is a timeline element that contains nested <div id=\"s1bg\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#s1",
+        "dataAttributes": {},
+        "sourceFile": "D:\\Backend\\brag-output\\composition\\index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"s1\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"s2\"> is a timeline element that contains nested <div id=\"s2e\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#s2",
+        "dataAttributes": {},
+        "sourceFile": "D:\\Backend\\brag-output\\composition\\index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"s2\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"s3\"> is a timeline element that contains nested <div>. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#s3",
+        "dataAttributes": {},
+        "sourceFile": "D:\\Backend\\brag-output\\composition\\index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"s3\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"s4\"> is a timeline element that contains nested <div>. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#s4",
+        "dataAttributes": {},
+        "sourceFile": "D:\\Backend\\brag-output\\composition\\index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"s4\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"s5\"> is a timeline element that contains nested <div>. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#s5",
+        "dataAttributes": {},
+        "sourceFile": "D:\\Backend\\brag-output\\composition\\index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"s5\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"s6\"> is a timeline element that contains nested <div>. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#s6",
+        "dataAttributes": {},
+        "sourceFile": "D:\\Backend\\brag-output\\composition\\index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"s6\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"s7\"> is a timeline element that contains nested <div>. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#s7",
+        "dataAttributes": {},
+        "sourceFile": "D:\\Backend\\brag-output\\composition\\index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"s7\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"s8\"> is a timeline element that contains nested <div>. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#s8",
+        "dataAttributes": {},
+        "sourceFile": "D:\\Backend\\brag-output\\composition\\index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"s8\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      }
+    ],
+    "filesScanned": 1
+  },
+  "runtime": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": []
+  },
+  "layout": {
+    "ok": false,
+    "errorCount": 4,
+    "warningCount": 0,
+    "infoCount": 14,
+    "findings": [
+      {
+        "code": "content_overlap",
+        "severity": "error",
+        "time": 85,
+        "selector": "#p2 > div:nth-of-type(1)",
+        "message": "Two text blocks overlap and may render unreadable.",
+        "rect": {
+          "left": 750,
+          "top": 460,
+          "right": 1041.03,
+          "bottom": 492,
+          "width": 291.03,
+          "height": 32
+        },
+        "containerSelector": "div.logo",
+        "text": "COMMUNITY CHANNEL",
+        "fixHint": "Give each block its own zone, or put data-layout-allow-overlap on the text or on a container inside the scene. A marker on the scene root does not apply.",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 750,
+          "y": 460,
+          "width": 291.03,
+          "height": 32
+        },
+        "firstSeen": 83.966,
+        "lastSeen": 90,
+        "occurrences": 14,
+        "heldMs": 6034.000000000006,
+        "times": [
+          83.966,
+          84.469,
+          84.972,
+          85,
+          85.475,
+          85.978,
+          86.48,
+          86.983,
+          87.486,
+          87.989,
+          88.492,
+          88.994,
+          89.497,
+          90
+        ]
+      },
+      {
+        "code": "content_overlap",
+        "severity": "error",
+        "time": 85,
+        "selector": "#p2 > div:nth-of-type(2)",
+        "message": "Two text blocks overlap and may render unreadable.",
+        "rect": {
+          "left": 750,
+          "top": 510,
+          "right": 1031.41,
+          "bottom": 585,
+          "width": 281.41,
+          "height": 75
+        },
+        "containerSelector": "div.logo",
+        "text": "From €450",
+        "fixHint": "Give each block its own zone, or put data-layout-allow-overlap on the text or on a container inside the scene. A marker on the scene root does not apply.",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 750,
+          "y": 510,
+          "width": 281.41,
+          "height": 75
+        },
+        "firstSeen": 83.966,
+        "lastSeen": 90,
+        "occurrences": 14,
+        "heldMs": 6034.000000000006,
+        "times": [
+          83.966,
+          84.469,
+          84.972,
+          85,
+          85.475,
+          85.978,
+          86.48,
+          86.983,
+          87.486,
+          87.989,
+          88.492,
+          88.994,
+          89.497,
+          90
+        ]
+      },
+      {
+        "code": "content_overlap",
+        "severity": "error",
+        "time": 85,
+        "selector": "#p3 > div:nth-of-type(1)",
+        "message": "Two text blocks overlap and may render unreadable.",
+        "rect": {
+          "left": 1340,
+          "top": 460,
+          "right": 1615.53,
+          "bottom": 492,
+          "width": 275.53,
+          "height": 32
+        },
+        "containerSelector": "div.logo > i:nth-of-type(1)",
+        "text": "EVENT SPONSORSHIP",
+        "fixHint": "Give each block its own zone, or put data-layout-allow-overlap on the text or on a container inside the scene. A marker on the scene root does not apply.",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 1340,
+          "y": 460,
+          "width": 275.53,
+          "height": 32
+        },
+        "firstSeen": 83.966,
+        "lastSeen": 90,
+        "occurrences": 14,
+        "heldMs": 6034.000000000006,
+        "times": [
+          83.966,
+          84.469,
+          84.972,
+          85,
+          85.475,
+          85.978,
+          86.48,
+          86.983,
+          87.486,
+          87.989,
+          88.492,
+          88.994,
+          89.497,
+          90
+        ]
+      },
+      {
+        "code": "content_overlap",
+        "severity": "error",
+        "time": 85,
+        "selector": "#p3 > div:nth-of-type(2)",
+        "message": "Two text blocks overlap and may render unreadable.",
+        "rect": {
+          "left": 1340,
+          "top": 510,
+          "right": 1481.13,
+          "bottom": 585,
+          "width": 141.13,
+          "height": 75
+        },
+        "containerSelector": "div.logo > i:nth-of-type(1)",
+        "text": "€900",
+        "fixHint": "Give each block its own zone, or put data-layout-allow-overlap on the text or on a container inside the scene. A marker on the scene root does not apply.",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 1340,
+          "y": 510,
+          "width": 141.13,
+          "height": 75
+        },
+        "firstSeen": 83.966,
+        "lastSeen": 90,
+        "occurrences": 14,
+        "heldMs": 6034.000000000006,
+        "times": [
+          83.966,
+          84.469,
+          84.972,
+          85,
+          85.475,
+          85.978,
+          86.48,
+          86.983,
+          87.486,
+          87.989,
+          88.492,
+          88.994,
+          89.497,
+          90
+        ]
+      },
+      {
+        "code": "canvas_overflow",
+        "severity": "info",
+        "time": 5,
+        "selector": "#hb4",
+        "message": "Text extends outside the composition canvas.",
+        "rect": {
+          "left": 1206,
+          "top": 345.34,
+          "right": 2027.64,
+          "bottom": 379.34,
+          "width": 821.64,
+          "height": 34
+        },
+        "containerSelector": "#root",
+        "text": "Olimme mukana, kun viranomaiset ratsasivat ravintoloita Oulun yössä",
+        "fixHint": "Move the text inward, reduce its size, or mark intentional off-canvas animation with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1920,
+          "bottom": 1080,
+          "width": 1920,
+          "height": 1080
+        },
+        "overflow": {
+          "right": 107.64
+        },
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 1206,
+          "y": 345.34,
+          "width": 821.64,
+          "height": 34
+        },
+        "firstSeen": 5,
+        "lastSeen": 5,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          5
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 85,
+        "selector": "#s8 > div:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 120,
+          "top": 100,
+          "right": 376.19,
+          "bottom": 132,
+          "width": 256.19,
+          "height": 32
+        },
+        "containerSelector": "#s8o",
+        "text": "What pays for it",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 120,
+          "y": 100,
+          "width": 256.19,
+          "height": 32
+        },
+        "firstSeen": 85,
+        "lastSeen": 85,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 85,
+        "selector": "#s8t",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 120,
+          "top": 135,
+          "right": 967.88,
+          "bottom": 257,
+          "width": 847.88,
+          "height": 122
+        },
+        "containerSelector": "#s8o",
+        "text": "Placements that stay",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 120,
+          "y": 135,
+          "width": 847.88,
+          "height": 122
+        },
+        "firstSeen": 85,
+        "lastSeen": 85,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 85,
+        "selector": "#s8t > em:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 967.88,
+          "top": 135,
+          "right": 1282.34,
+          "bottom": 257,
+          "width": 314.47,
+          "height": 122
+        },
+        "containerSelector": "#s8o",
+        "text": "labelled.",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 967.88,
+          "y": 135,
+          "width": 314.47,
+          "height": 122
+        },
+        "firstSeen": 85,
+        "lastSeen": 85,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 85,
+        "selector": "#p1 > div:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 160,
+          "top": 460,
+          "right": 448.78,
+          "bottom": 492,
+          "width": 288.78,
+          "height": 32
+        },
+        "containerSelector": "#s8o",
+        "text": "Recruitment listing",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 160,
+          "y": 460,
+          "width": 288.78,
+          "height": 32
+        },
+        "firstSeen": 85,
+        "lastSeen": 85,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 85,
+        "selector": "#p1 > div:nth-of-type(2)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 160,
+          "top": 510,
+          "right": 301.13,
+          "bottom": 585,
+          "width": 141.13,
+          "height": 75
+        },
+        "containerSelector": "#s8o",
+        "text": "€250",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 160,
+          "y": 510,
+          "width": 141.13,
+          "height": 75
+        },
+        "firstSeen": 85,
+        "lastSeen": 85,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 85,
+        "selector": "#p1 > div:nth-of-type(3)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 160,
+          "top": 593,
+          "right": 286.14,
+          "bottom": 630,
+          "width": 126.14,
+          "height": 37
+        },
+        "containerSelector": "#s8o",
+        "text": "per listing",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 160,
+          "y": 593,
+          "width": 126.14,
+          "height": 37
+        },
+        "firstSeen": 85,
+        "lastSeen": 85,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 85,
+        "selector": "#p2 > div:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 750,
+          "top": 460,
+          "right": 1041.03,
+          "bottom": 492,
+          "width": 291.03,
+          "height": 32
+        },
+        "containerSelector": "#s8o",
+        "text": "Community channel",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 750,
+          "y": 460,
+          "width": 291.03,
+          "height": 32
+        },
+        "firstSeen": 85,
+        "lastSeen": 85,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 85,
+        "selector": "#p2 > div:nth-of-type(2)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 750,
+          "top": 510,
+          "right": 1031.41,
+          "bottom": 585,
+          "width": 281.41,
+          "height": 75
+        },
+        "containerSelector": "#s8o",
+        "text": "From €450",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 750,
+          "y": 510,
+          "width": 281.41,
+          "height": 75
+        },
+        "firstSeen": 85,
+        "lastSeen": 85,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 85,
+        "selector": "#p2 > div:nth-of-type(3)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 750,
+          "top": 593,
+          "right": 1168.61,
+          "bottom": 667.8,
+          "width": 418.61,
+          "height": 74.8
+        },
+        "containerSelector": "#s8o",
+        "text": "per month · no editorial approval rights",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 750,
+          "y": 593,
+          "width": 418.61,
+          "height": 74.8
+        },
+        "firstSeen": 85,
+        "lastSeen": 85,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 85,
+        "selector": "#p3 > div:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 1340,
+          "top": 460,
+          "right": 1615.53,
+          "bottom": 492,
+          "width": 275.53,
+          "height": 32
+        },
+        "containerSelector": "#s8o",
+        "text": "Event sponsorship",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 1340,
+          "y": 460,
+          "width": 275.53,
+          "height": 32
+        },
+        "firstSeen": 85,
+        "lastSeen": 85,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 85,
+        "selector": "#p3 > div:nth-of-type(2)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 1340,
+          "top": 510,
+          "right": 1481.13,
+          "bottom": 585,
+          "width": 141.13,
+          "height": 75
+        },
+        "containerSelector": "#s8o",
+        "text": "€900",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 1340,
+          "y": 510,
+          "width": 141.13,
+          "height": 75
+        },
+        "firstSeen": 85,
+        "lastSeen": 85,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 85,
+        "selector": "#p3 > div:nth-of-type(3)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 1340,
+          "top": 593,
+          "right": 1461.78,
+          "bottom": 630,
+          "width": 121.78,
+          "height": 37
+        },
+        "containerSelector": "#s8o",
+        "text": "per event",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 1340,
+          "y": 593,
+          "width": 121.78,
+          "height": 37
+        },
+        "firstSeen": 85,
+        "lastSeen": 85,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 85,
+        "selector": "#p4",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 120,
+          "top": 839,
+          "right": 568.88,
+          "bottom": 885,
+          "width": 448.88,
+          "height": 46
+        },
+        "containerSelector": "#s8o",
+        "text": "Money never buys coverage.",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 120,
+          "y": 839,
+          "width": 448.88,
+          "height": 46
+        },
+        "firstSeen": 85,
+        "lastSeen": 85,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          85
+        ]
+      }
+    ],
+    "duration": 90,
+    "samples": [
+      5,
+      15,
+      25,
+      35,
+      45,
+      55,
+      65,
+      75,
+      85
+    ],
+    "transitionSamples": [],
+    "transitionSamplesDropped": 0,
+    "tolerance": 2,
+    "totalIssueCount": 18,
+    "truncated": false
+  },
+  "motion": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": false,
+    "samples": 0
+  },
+  "contrast": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 16,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 1.93:1; WCAG AA requires 3:1.",
+        "text": "Finnish.",
+        "fg": "rgb(51,204,122)",
+        "bg": "rgb(250,245,240)",
+        "ratio": 1.93,
+        "requiredRatio": 3,
+        "suggestedColor": "rgb(41,162,97)",
+        "large": true,
+        "selector": "div > div:nth-of-type(1) > div:nth-of-type(3) > em",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 886.09375,
+          "y": 465,
+          "width": 284.5625,
+          "height": 122
+        },
+        "time": 5,
+        "times": [
+          5
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 1.93:1; WCAG AA requires 3:1.",
+        "text": "one event.",
+        "fg": "rgb(51,204,122)",
+        "bg": "rgb(250,245,240)",
+        "ratio": 1.93,
+        "requiredRatio": 3,
+        "suggestedColor": "rgb(41,162,97)",
+        "large": true,
+        "selector": "div > div:nth-of-type(3) > div:nth-of-type(2) > em",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 617.265625,
+          "y": 135,
+          "width": 403.421875,
+          "height": 122
+        },
+        "time": 25,
+        "times": [
+          25
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 1.93:1; WCAG AA requires 3:1.",
+        "text": "topic tree.",
+        "fg": "rgb(51,204,122)",
+        "bg": "rgb(250,245,240)",
+        "ratio": 1.93,
+        "requiredRatio": 3,
+        "suggestedColor": "rgb(41,162,97)",
+        "large": true,
+        "selector": "div > div:nth-of-type(4) > div:nth-of-type(2) > em",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 896.859375,
+          "y": 135,
+          "width": 387.234375,
+          "height": 122
+        },
+        "time": 45,
+        "times": [
+          45
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 1.93:1; WCAG AA requires 3:1.",
+        "text": "language.",
+        "fg": "rgb(51,204,122)",
+        "bg": "rgb(250,245,240)",
+        "ratio": 1.93,
+        "requiredRatio": 3,
+        "suggestedColor": "rgb(41,162,97)",
+        "large": true,
+        "selector": "div > div:nth-of-type(6) > div:nth-of-type(1) > div:nth-of-type(2) > span",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 120,
+          "y": 220,
+          "width": 250.203125,
+          "height": 80
+        },
+        "time": 65,
+        "times": [
+          65
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 2.63:1; WCAG AA requires 3:1.",
+        "text": "What pays for it",
+        "fg": "rgb(102,87,79)",
+        "bg": "rgb(27,20,17)",
+        "ratio": 2.63,
+        "requiredRatio": 3,
+        "suggestedColor": "rgb(110,96,88)",
+        "large": true,
+        "selector": "div > div:nth-of-type(8) > div:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 120,
+          "y": 100,
+          "width": 256.1875,
+          "height": 32
+        },
+        "time": 85,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 1:1; WCAG AA requires 3:1.",
+        "text": "Placements that stay labelled.",
+        "fg": "rgb(27,20,17)",
+        "bg": "rgb(27,20,17)",
+        "ratio": 1,
+        "requiredRatio": 3,
+        "suggestedColor": "rgb(103,98,96)",
+        "large": true,
+        "selector": "#s8t",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 120,
+          "y": 150,
+          "width": 1680,
+          "height": 93.828125
+        },
+        "time": 85,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 2.63:1; WCAG AA requires 3:1.",
+        "text": "Recruitment listing",
+        "fg": "rgb(102,87,79)",
+        "bg": "rgb(27,20,17)",
+        "ratio": 2.63,
+        "requiredRatio": 3,
+        "suggestedColor": "rgb(110,96,88)",
+        "large": true,
+        "selector": "div > div:nth-of-type(8) > div:nth-of-type(3) > div:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 160,
+          "y": 460,
+          "width": 420,
+          "height": 32
+        },
+        "time": 85,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 1:1; WCAG AA requires 3:1.",
+        "text": "€250",
+        "fg": "rgb(27,20,17)",
+        "bg": "rgb(27,20,17)",
+        "ratio": 1,
+        "requiredRatio": 3,
+        "suggestedColor": "rgb(103,98,96)",
+        "large": true,
+        "selector": "div > div:nth-of-type(8) > div:nth-of-type(3) > div:nth-of-type(2)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 160,
+          "y": 510,
+          "width": 420,
+          "height": 75
+        },
+        "time": 85,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 2.63:1; WCAG AA requires 3:1.",
+        "text": "per listing",
+        "fg": "rgb(102,87,79)",
+        "bg": "rgb(27,20,17)",
+        "ratio": 2.63,
+        "requiredRatio": 3,
+        "suggestedColor": "rgb(110,96,88)",
+        "large": true,
+        "selector": "div > div:nth-of-type(8) > div:nth-of-type(3) > div:nth-of-type(3)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 160,
+          "y": 593,
+          "width": 420,
+          "height": 37.796875
+        },
+        "time": 85,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 2.63:1; WCAG AA requires 3:1.",
+        "text": "Community channel",
+        "fg": "rgb(102,87,79)",
+        "bg": "rgb(27,20,17)",
+        "ratio": 2.63,
+        "requiredRatio": 3,
+        "suggestedColor": "rgb(110,96,88)",
+        "large": true,
+        "selector": "div > div:nth-of-type(8) > div:nth-of-type(4) > div:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 750,
+          "y": 460,
+          "width": 420,
+          "height": 32
+        },
+        "time": 85,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 1:1; WCAG AA requires 3:1.",
+        "text": "From €450",
+        "fg": "rgb(27,20,17)",
+        "bg": "rgb(27,20,17)",
+        "ratio": 1,
+        "requiredRatio": 3,
+        "suggestedColor": "rgb(103,98,96)",
+        "large": true,
+        "selector": "div > div:nth-of-type(8) > div:nth-of-type(4) > div:nth-of-type(2)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 750,
+          "y": 510,
+          "width": 420,
+          "height": 75
+        },
+        "time": 85,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 2.63:1; WCAG AA requires 3:1.",
+        "text": "per month · no editorial approval rights",
+        "fg": "rgb(102,87,79)",
+        "bg": "rgb(27,20,17)",
+        "ratio": 2.63,
+        "requiredRatio": 3,
+        "suggestedColor": "rgb(110,96,88)",
+        "large": true,
+        "selector": "div > div:nth-of-type(8) > div:nth-of-type(4) > div:nth-of-type(3)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 750,
+          "y": 593,
+          "width": 420,
+          "height": 75.59375
+        },
+        "time": 85,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 2.63:1; WCAG AA requires 3:1.",
+        "text": "Event sponsorship",
+        "fg": "rgb(102,87,79)",
+        "bg": "rgb(27,20,17)",
+        "ratio": 2.63,
+        "requiredRatio": 3,
+        "suggestedColor": "rgb(110,96,88)",
+        "large": true,
+        "selector": "div > div:nth-of-type(8) > div:nth-of-type(5) > div:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 1340,
+          "y": 460,
+          "width": 420,
+          "height": 32
+        },
+        "time": 85,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 1:1; WCAG AA requires 3:1.",
+        "text": "€900",
+        "fg": "rgb(27,20,17)",
+        "bg": "rgb(27,20,17)",
+        "ratio": 1,
+        "requiredRatio": 3,
+        "suggestedColor": "rgb(103,98,96)",
+        "large": true,
+        "selector": "div > div:nth-of-type(8) > div:nth-of-type(5) > div:nth-of-type(2)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 1340,
+          "y": 510,
+          "width": 420,
+          "height": 75
+        },
+        "time": 85,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 2.63:1; WCAG AA requires 3:1.",
+        "text": "per event",
+        "fg": "rgb(102,87,79)",
+        "bg": "rgb(27,20,17)",
+        "ratio": 2.63,
+        "requiredRatio": 3,
+        "suggestedColor": "rgb(110,96,88)",
+        "large": true,
+        "selector": "div > div:nth-of-type(8) > div:nth-of-type(5) > div:nth-of-type(3)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 1340,
+          "y": 593,
+          "width": 420,
+          "height": 37.796875
+        },
+        "time": 85,
+        "times": [
+          85
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 1:1; WCAG AA requires 3:1.",
+        "text": "Money never buys coverage.",
+        "fg": "rgb(27,20,17)",
+        "bg": "rgb(27,20,17)",
+        "ratio": 1,
+        "requiredRatio": 3,
+        "suggestedColor": "rgb(103,98,96)",
+        "large": true,
+        "selector": "#p4",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 120,
+          "y": 840,
+          "width": 1680,
+          "height": 45.890625
+        },
+        "time": 85,
+        "times": [
+          85
+        ]
+      }
+    ],
+    "enabled": true,
+    "samples": [
+      5,
+      25,
+      45,
+      65,
+      85
+    ],
+    "checked": 60,
+    "passed": 44
+  },
+  "craft": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 9,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "first_frame_empty",
+        "severity": "warning",
+        "message": "Frame 0 shows only the background, and the first frame is the thumbnail on social players: have the title or key image already on screen at 0 s instead of entering from nothing; see references/review.md.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0
+      },
+      {
+        "code": "dead_stretch",
+        "severity": "warning",
+        "message": "Nothing on screen changes for 7.96 s (13.97–21.94 s): start the next move within 3 s, or put data-hold on the element whose stillness is deliberate; see references/motion.md.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 13.973,
+        "seconds": 7.964,
+        "floorSeconds": 3,
+        "until": 21.937
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 56 text elements stay under it for 0.5 s or more, the smallest \"Kaleva · FI · headline only\" at 20 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "Kaleva · FI · headline only",
+        "selector": "#r1 > div:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 152,
+          "y": 417.22,
+          "width": 342.61,
+          "height": 29
+        },
+        "time": 23.74,
+        "times": [
+          0.451,
+          0.751,
+          0.902,
+          1.202,
+          1.503,
+          8.414,
+          9.616,
+          9.616,
+          10.217,
+          10.217,
+          10.818,
+          10.818,
+          11.419,
+          11.419,
+          12.02,
+          12.02,
+          12.621,
+          12.621,
+          22.087,
+          23.74,
+          24.791,
+          25.843,
+          29.149,
+          29.149,
+          29.149,
+          29.149,
+          29.149,
+          36.06,
+          50.033,
+          51.536,
+          51.836,
+          52.137,
+          52.437,
+          52.738,
+          62.053,
+          62.654,
+          62.654,
+          62.654,
+          63.406,
+          63.406,
+          64.007,
+          64.007,
+          64.457,
+          64.457,
+          65.81,
+          65.81,
+          65.81,
+          65.81,
+          70.017,
+          71.068,
+          71.068,
+          78.13,
+          79.332,
+          79.933,
+          80.384,
+          83.84
+        ],
+        "fontPx": 19.84,
+        "floorPx": 28,
+        "seconds": 5.258,
+        "elements": [
+          {
+            "selector": "#r1 > div:nth-of-type(1)",
+            "text": "Kaleva · FI · headline only",
+            "fontPx": 19.84,
+            "time": 23.74,
+            "seconds": 5.258
+          },
+          {
+            "selector": "#r2 > div:nth-of-type(1)",
+            "text": "Yle Lappi · FI",
+            "fontPx": 19.84,
+            "time": 24.791,
+            "seconds": 4.207
+          },
+          {
+            "selector": "#r3 > div:nth-of-type(1)",
+            "text": "Yle News · EN",
+            "fontPx": 19.84,
+            "time": 25.843,
+            "seconds": 3.155
+          },
+          {
+            "selector": "#sp > div:nth-of-type(1)",
+            "text": "Sponsored · Recruitment listing",
+            "fontPx": 19.9,
+            "time": 65.81,
+            "seconds": 4.206
+          },
+          {
+            "selector": "div.credit",
+            "text": "Music: Sascha Ende, ende.app (CC BY 4.0)",
+            "fontPx": 20,
+            "time": 83.84,
+            "seconds": 6.16
+          },
+          {
+            "selector": "span.btn",
+            "text": "See pricing →",
+            "fontPx": 21.89,
+            "time": 65.81,
+            "seconds": 4.206
+          },
+          {
+            "selector": "#f0 > span:nth-of-type(1)",
+            "text": "headline only",
+            "fontPx": 22,
+            "time": 9.616,
+            "seconds": 12.471
+          },
+          {
+            "selector": "#f1 > span:nth-of-type(1)",
+            "text": "official",
+            "fontPx": 22,
+            "time": 10.217,
+            "seconds": 11.87
+          },
+          {
+            "selector": "#f2 > span:nth-of-type(1)",
+            "text": "official",
+            "fontPx": 22,
+            "time": 10.818,
+            "seconds": 11.269
+          },
+          {
+            "selector": "#f3 > span:nth-of-type(1)",
+            "text": "official",
+            "fontPx": 22,
+            "time": 11.419,
+            "seconds": 10.668
+          },
+          {
+            "selector": "#f4 > span:nth-of-type(1)",
+            "text": "official",
+            "fontPx": 22,
+            "time": 12.02,
+            "seconds": 10.067
+          },
+          {
+            "selector": "#f5 > span:nth-of-type(1)",
+            "text": "official",
+            "fontPx": 22,
+            "time": 12.621,
+            "seconds": 9.466
+          },
+          {
+            "selector": "#ps0 > div:nth-of-type(1)",
+            "text": "01",
+            "fontPx": 22,
+            "time": 51.536,
+            "seconds": 10.517
+          },
+          {
+            "selector": "#ps1 > div:nth-of-type(1)",
+            "text": "02",
+            "fontPx": 22,
+            "time": 51.836,
+            "seconds": 10.217
+          },
+          {
+            "selector": "#ps2 > div:nth-of-type(1)",
+            "text": "03",
+            "fontPx": 22,
+            "time": 52.137,
+            "seconds": 9.916
+          },
+          {
+            "selector": "#ps3 > div:nth-of-type(1)",
+            "text": "04",
+            "fontPx": 22,
+            "time": 52.437,
+            "seconds": 9.616
+          },
+          {
+            "selector": "#ps4 > div:nth-of-type(1)",
+            "text": "05",
+            "fontPx": 22,
+            "time": 52.738,
+            "seconds": 9.315
+          },
+          {
+            "selector": "#st1 > div:nth-of-type(2) > div:nth-of-type(2)",
+            "text": "Finnish Immigration Service · EN",
+            "fontPx": 22,
+            "time": 63.406,
+            "seconds": 6.61
+          },
+          {
+            "selector": "#st2 > div:nth-of-type(2) > div:nth-of-type(2)",
+            "text": "Finnish Immigration Service · EN",
+            "fontPx": 22,
+            "time": 64.007,
+            "seconds": 6.009
+          },
+          {
+            "selector": "#st3 > div:nth-of-type(2) > div:nth-of-type(2)",
+            "text": "Finnish Immigration Service · EN",
+            "fontPx": 22,
+            "time": 64.457,
+            "seconds": 5.559
+          },
+          {
+            "selector": "#s7p > div:nth-of-type(1) > span:nth-of-type(2)",
+            "text": "Example",
+            "fontPx": 22,
+            "time": 71.068,
+            "seconds": 7.062
+          },
+          {
+            "selector": "#s3ev > div:nth-of-type(1)",
+            "text": "One event",
+            "fontPx": 23.17,
+            "time": 29.149,
+            "seconds": 6.911
+          },
+          {
+            "selector": "#s3ev > div:nth-of-type(3) > span:nth-of-type(1)",
+            "text": "3 reports",
+            "fontPx": 23.17,
+            "time": 29.149,
+            "seconds": 6.911
+          },
+          {
+            "selector": "#s3ev > div:nth-of-type(3) > span:nth-of-type(2)",
+            "text": "2 independent outlets",
+            "fontPx": 23.17,
+            "time": 29.149,
+            "seconds": 6.911
+          },
+          {
+            "selector": "#s3ev > div:nth-of-type(3) > span:nth-of-type(3)",
+            "text": "Confirmed",
+            "fontPx": 23.17,
+            "time": 29.149,
+            "seconds": 6.911
+          },
+          {
+            "selector": "#s3ev > div:nth-of-type(3) > span:nth-of-type(4)",
+            "text": "FI · EN",
+            "fontPx": 23.17,
+            "time": 29.149,
+            "seconds": 6.911
+          },
+          {
+            "selector": "#sp > div:nth-of-type(3)",
+            "text": "Reach newcomers and seasonal workers where they read the news.",
+            "fontPx": 23.88,
+            "time": 65.81,
+            "seconds": 4.206
+          },
+          {
+            "selector": "#sp > div:nth-of-type(4) > span:nth-of-type(1)",
+            "text": "€250 per listing",
+            "fontPx": 23.88,
+            "time": 65.81,
+            "seconds": 4.206
+          },
+          {
+            "selector": "#s2e",
+            "text": "The agents",
+            "fontPx": 24,
+            "time": 8.414,
+            "seconds": 13.673
+          },
+          {
+            "selector": "#f0 > div:nth-of-type(2)",
+            "text": "3 feeds · FI",
+            "fontPx": 24,
+            "time": 9.616,
+            "seconds": 12.471
+          },
+          {
+            "selector": "#f1 > div:nth-of-type(2)",
+            "text": "2 feeds · FI",
+            "fontPx": 24,
+            "time": 10.217,
+            "seconds": 11.87
+          },
+          {
+            "selector": "#f2 > div:nth-of-type(2)",
+            "text": "FI",
+            "fontPx": 24,
+            "time": 10.818,
+            "seconds": 11.269
+          },
+          {
+            "selector": "#f3 > div:nth-of-type(2)",
+            "text": "FI",
+            "fontPx": 24,
+            "time": 11.419,
+            "seconds": 10.668
+          },
+          {
+            "selector": "#f4 > div:nth-of-type(2)",
+            "text": "FI",
+            "fontPx": 24,
+            "time": 12.02,
+            "seconds": 10.067
+          },
+          {
+            "selector": "#f5 > div:nth-of-type(2)",
+            "text": "3 feeds · EN",
+            "fontPx": 24,
+            "time": 12.621,
+            "seconds": 9.466
+          },
+          {
+            "selector": "#s3 > div:nth-of-type(1)",
+            "text": "Example",
+            "fontPx": 24,
+            "time": 22.087,
+            "seconds": 13.973
+          },
+          {
+            "selector": "#s4 > div:nth-of-type(1)",
+            "text": "The knowledge tree",
+            "fontPx": 24,
+            "time": 36.06,
+            "seconds": 13.973
+          },
+          {
+            "selector": "#s5 > div:nth-of-type(1)",
+            "text": "One story",
+            "fontPx": 24,
+            "time": 50.033,
+            "seconds": 12.02
+          },
+          {
+            "selector": "#s6 > div:nth-of-type(1) > div:nth-of-type(1)",
+            "text": "The reader",
+            "fontPx": 24,
+            "time": 62.053,
+            "seconds": 7.963
+          },
+          {
+            "selector": "#s6app > div:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "For you",
+            "fontPx": 24,
+            "time": 62.654,
+            "seconds": 7.362
+          },
+          {
+            "selector": "#s6app > div:nth-of-type(1) > span:nth-of-type(2)",
+            "text": "Trending",
+            "fontPx": 24,
+            "time": 62.654,
+            "seconds": 7.362
+          },
+          {
+            "selector": "#s6app > div:nth-of-type(1) > span:nth-of-type(3)",
+            "text": "Following",
+            "fontPx": 24,
+            "time": 62.654,
+            "seconds": 7.362
+          },
+          {
+            "selector": "#s7 > div:nth-of-type(1)",
+            "text": "The editor",
+            "fontPx": 24,
+            "time": 70.017,
+            "seconds": 8.113
+          },
+          {
+            "selector": "#s7p > div:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "Clicks",
+            "fontPx": 24,
+            "time": 71.068,
+            "seconds": 7.062
+          },
+          {
+            "selector": "#s8 > div:nth-of-type(1)",
+            "text": "What pays for it",
+            "fontPx": 24,
+            "time": 78.13,
+            "seconds": 11.87
+          },
+          {
+            "selector": "#p1 > div:nth-of-type(1)",
+            "text": "Recruitment listing",
+            "fontPx": 24,
+            "time": 79.332,
+            "seconds": 10.668
+          },
+          {
+            "selector": "#p2 > div:nth-of-type(1)",
+            "text": "Community channel",
+            "fontPx": 24,
+            "time": 79.933,
+            "seconds": 10.067
+          },
+          {
+            "selector": "#p3 > div:nth-of-type(1)",
+            "text": "Event sponsorship",
+            "fontPx": 24,
+            "time": 80.384,
+            "seconds": 9.616
+          },
+          {
+            "selector": "#hb0",
+            "text": "Linjojen 59 ja 59S aikatauluja on päivitetty",
+            "fontPx": 26,
+            "time": 0.451,
+            "seconds": 5.108
+          },
+          {
+            "selector": "#hb1",
+            "text": "Pikisaaren polulla voi nyt valita itselleen sopivan valaistuksen",
+            "fontPx": 26,
+            "time": 0.751,
+            "seconds": 4.808
+          },
+          {
+            "selector": "#hb2",
+            "text": "Aamulento Helsingistä Kuusamoon käntyi takaisin teknisen vian vuoksi",
+            "fontPx": 26,
+            "time": 0.902,
+            "seconds": 4.657
+          },
+          {
+            "selector": "#hb3",
+            "text": "Hailuodon, Iin, Kempeleen, Lumijoen, Oulun ja Pudasjärven jätetaksa",
+            "fontPx": 26,
+            "time": 1.202,
+            "seconds": 4.357
+          },
+          {
+            "selector": "#hb4",
+            "text": "Olimme mukana, kun viranomaiset ratsasivat ravintoloita Oulun yössä",
+            "fontPx": 26,
+            "time": 1.503,
+            "seconds": 4.056
+          },
+          {
+            "selector": "#st1 > div:nth-of-type(1)",
+            "text": "F",
+            "fontPx": 26,
+            "time": 63.406,
+            "seconds": 6.61
+          },
+          {
+            "selector": "#st2 > div:nth-of-type(1)",
+            "text": "F",
+            "fontPx": 26,
+            "time": 64.007,
+            "seconds": 6.009
+          },
+          {
+            "selector": "#st3 > div:nth-of-type(1)",
+            "text": "F",
+            "fontPx": 26,
+            "time": 64.457,
+            "seconds": 5.559
+          }
+        ]
+      },
+      {
+        "code": "line_unread",
+        "severity": "warning",
+        "message": "\"Code, not a guess, decides what is the same news. Five fe...\" (20 words) is on screen 4.70 s (±0.01 s), under its 4.88 s floor: hold it about 0.5 s + 0.3 s a word (6.50 s here) before it leaves or changes; see references/motion.md.",
+        "text": "Code, not a guess, decides what is the same news. Five feeds from one broadcaster still count as one outlet.",
+        "selector": "#s3c",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 120,
+          "y": 823.59,
+          "width": 1584.81,
+          "height": 91.88999999999999
+        },
+        "time": 31.308,
+        "words": 20,
+        "seconds": 4.695,
+        "floorSeconds": 4.875
+      },
+      {
+        "code": "dead_stretch",
+        "severity": "warning",
+        "message": "Nothing on screen changes for 4.06 s (31.85–35.91 s): start the next move within 3 s, or put data-hold on the element whose stillness is deliberate; see references/motion.md.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 31.853,
+        "seconds": 4.057,
+        "floorSeconds": 3,
+        "until": 35.91
+      },
+      {
+        "code": "line_unread",
+        "severity": "warning",
+        "message": "\"Related topics are linked, and that is how a reader finds...\" (18 words) is on screen 4.30 s (±0.01 s), under its 4.42 s floor: hold it about 0.5 s + 0.3 s a word (5.90 s here) before it leaves or changes; see references/motion.md.",
+        "text": "Related topics are linked, and that is how a reader finds the next story that matters to them.",
+        "selector": "#s4c",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 120,
+          "y": 903.59,
+          "width": 1439.64,
+          "height": 46
+        },
+        "time": 45.704,
+        "words": 18,
+        "seconds": 4.301,
+        "floorSeconds": 4.425
+      },
+      {
+        "code": "dead_stretch",
+        "severity": "warning",
+        "message": "Nothing on screen changes for 3.46 s (46.43–49.88 s): start the next move within 3 s, or put data-hold on the element whose stillness is deliberate; see references/motion.md.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 46.427,
+        "seconds": 3.456,
+        "floorSeconds": 3,
+        "until": 49.883
+      },
+      {
+        "code": "dead_stretch",
+        "severity": "warning",
+        "message": "Nothing on screen changes for 3.76 s (66.11–69.87 s): start the next move within 3 s, or put data-hold on the element whose stillness is deliberate; see references/motion.md.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 66.11,
+        "seconds": 3.756,
+        "floorSeconds": 3,
+        "until": 69.866
+      },
+      {
+        "code": "dead_stretch",
+        "severity": "warning",
+        "message": "Nothing on screen changes for 3.01 s (74.97–77.98 s): start the next move within 3 s, or put data-hold on the element whose stillness is deliberate; see references/motion.md.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 74.975,
+        "seconds": 3.005,
+        "floorSeconds": 3,
+        "until": 77.98
+      }
+    ],
+    "enabled": true,
+    "step": 0.15000000000000036,
+    "samples": 599
+  },
+  "hdr": {
+    "autoPromotion": null,
+    "inspection": "available"
+  },
+  "snapshots": {
+    "enabled": false,
+    "files": [],
+    "times": [],
+    "findingFiles": []
+  }
+}

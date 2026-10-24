@@ -90,6 +90,37 @@ class ClickRepository(BaseRepository):
         ]
         return [row async for row in self.collection.aggregate(pipeline)]
 
+    async def breakdown(self, since: datetime) -> list[dict[str, Any]]:
+        """Clicks since ``since`` per article, community and kind. Aggregates only: readers are
+        counted, never returned."""
+
+        pipeline: list[dict[str, Any]] = [
+            {"$match": {"last_at": {"$gte": since}}},
+            {
+                "$group": {
+                    "_id": {
+                        "article": "$article_id",
+                        "community": "$community_id",
+                        "kind": "$kind",
+                    },
+                    "readers": {"$sum": 1},
+                    "clicks": {"$sum": "$count"},
+                    "last_at": {"$max": "$last_at"},
+                }
+            },
+        ]
+        return [row async for row in self.collection.aggregate(pipeline)]
+
+    async def unique_readers(self, since: datetime) -> int:
+        rows = self.collection.aggregate(
+            [
+                {"$match": {"last_at": {"$gte": since}}},
+                {"$group": {"_id": "$clerk_user_id"}},
+                {"$count": "n"},
+            ]
+        )
+        return next(iter([row["n"] async for row in rows]), 0)
+
 
 async def with_clicks(database: Any, docs: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Attach each article's click counts as ``clicks``, with one query for the whole list."""

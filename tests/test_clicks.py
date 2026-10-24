@@ -2,6 +2,8 @@
 
 from bson import ObjectId
 
+from tests.helpers import become_editor
+
 
 async def _click(client, authenticate, article, *, sub: str, kind: str = "outbound"):
     authenticate(sub)
@@ -94,3 +96,31 @@ async def test_top_lists_the_stories_most_readers_clicked(client, authenticate, 
     assert (rows[0]["users"], rows[0]["clicks"]) == (2, 2)
     assert (rows[1]["users"], rows[1]["clicks"]) == (1, 2)
     assert rows[0]["article"]["clicks"]["outbound_users"] == 2
+
+
+async def test_the_editor_report_shows_which_communities_read_a_story(
+    client, authenticate, grant_roles, make_article
+):
+    article = await make_article(title="Permit rules change")
+    await _click(client, authenticate, article, sub="user_a")
+    await _click(client, authenticate, article, sub="user_a")
+    await _click(client, authenticate, article, sub="user_b", kind="open")
+
+    await become_editor(client, authenticate, grant_roles)
+    response = await client.get("/api/v1/clicks/report")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["readers"] == 2
+    assert body["outbound"] == {"users": 1, "total": 2}
+    assert body["communities"][0]["community_id"] == "students"
+    row = body["articles"][0]
+    assert row["title"] == "Permit rules change"
+    assert row["audience"][0]["readers"] == 2
+    assert any("students" in line for line in row["why"])
+    assert "clerk_user_id" not in response.text and "user_a" not in response.text
+
+
+async def test_readers_cannot_open_the_click_report(client, authenticate):
+    authenticate("user_reader")
+    assert (await client.get("/api/v1/clicks/report")).status_code == 403
